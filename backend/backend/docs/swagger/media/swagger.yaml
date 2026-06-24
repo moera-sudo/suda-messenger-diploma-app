@@ -1,0 +1,318 @@
+basePath: /
+definitions:
+  github_com_moera-sudo_backend_backend_media-service_internal_domain_models.ConfirmUploadResponse:
+    properties:
+      media_id:
+        type: string
+      size_bytes:
+        type: integer
+      status:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_domain_models.GetURLResponse:
+    properties:
+      expires_in:
+        type: integer
+      media_id:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_domain_models.InitUploadRequest:
+    properties:
+      content_type:
+        type: string
+      is_private:
+        type: boolean
+      kind:
+        type: string
+      original_name:
+        type: string
+      owner_user_id:
+        type: string
+      size_bytes:
+        type: integer
+    required:
+    - content_type
+    - kind
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_domain_models.InitUploadResponse:
+    properties:
+      expires_in:
+        type: integer
+      media_id:
+        type: string
+      object_key:
+        type: string
+      upload_url:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_domain_models.MediaMetadata:
+    properties:
+      content_type:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_private:
+        type: boolean
+      kind:
+        type: string
+      original_name:
+        type: string
+      owner_user_id:
+        type: string
+      ready_at:
+        type: string
+      size_bytes:
+        type: integer
+      status:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.MessageRespond:
+    properties:
+      action:
+        type: string
+      message:
+        type: string
+    type: object
+host: localhost:8084
+info:
+  contact: {}
+  description: REST API for file upload, download and management via S3 presigned
+    URLs.
+  title: Suda Media Service API
+  version: "1.0"
+paths:
+  /api/media/{id}:
+    delete:
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a media file
+      tags:
+      - Media
+    get:
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.MediaMetadata'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get media file metadata
+      tags:
+      - Media
+  /api/media/{id}/confirm:
+    post:
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.ConfirmUploadResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Confirm that file was uploaded to S3
+      tags:
+      - Media
+  /api/media/{id}/download-url:
+    get:
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.GetURLResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a presigned URL for downloading
+      tags:
+      - Media
+  /api/media/{id}/link:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: entity_type and entity_id
+        in: body
+        name: request
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Link media to an entity (message, chat avatar, etc.)
+      tags:
+      - Media
+  /api/media/{id}/url:
+    get:
+      parameters:
+      - description: Media ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.GetURLResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a presigned URL for inline viewing
+      tags:
+      - Media
+  /api/media/upload/init:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Upload parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.InitUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_domain_models.InitUploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_media-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Initialize a file upload and get presigned URL
+      tags:
+      - Media
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

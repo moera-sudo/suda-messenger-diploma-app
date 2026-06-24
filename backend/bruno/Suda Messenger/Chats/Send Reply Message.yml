@@ -1,0 +1,42 @@
+info:
+  name: Send Reply Message
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "This is a reply!",
+        "type": "TEXT",
+        "reply_to_message_id": {{test_message_id}},
+        "client_side_id": "bruno-test-msg-003"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Has reply_to_message_id", function() {
+          expect(res.getBody().reply_to_message_id).to.be.a("number");
+        });
+
+        test("Content matches", function() {
+          expect(res.getBody().content).to.equal("This is a reply!");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

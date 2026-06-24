@@ -1,0 +1,73 @@
+info:
+  name: Setup All Chats
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "DIRECT",
+        "target_id": "{{test_user_id_2}}"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const axios = require('axios');
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+
+        const savedRes = await axios.post(baseUrl + prefix + "/chats", { type: "SAVED" }, { headers });
+        bru.setEnvVar("test_saved_chat_id", savedRes.data.id);
+        console.log("✅ SAVED chat: " + savedRes.data.id);
+    - type: after-response
+      code: |-
+        const axios = require('axios');
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_direct_chat_id", res.getBody().id);
+          bru.setEnvVar("test_chat_id", res.getBody().id);
+          console.log("✅ DIRECT chat: " + res.getBody().id);
+        }
+
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const user2 = bru.getEnvVar("test_user_id_2");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+
+        const groupRes = await axios.post(
+          baseUrl + prefix + "/chats",
+          { type: "GROUP", name: "Bruno Test Group", member_ids: [user2] },
+          { headers }
+        );
+        bru.setEnvVar("test_group_chat_id", groupRes.data.id);
+        console.log("✅ GROUP chat: " + groupRes.data.id);
+    - type: tests
+      code: |-
+        test("Direct chat created", function() {
+          expect(res.getStatus()).to.equal(201);
+          expect(res.getBody().type).to.equal("DIRECT");
+          expect(res.getBody().id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

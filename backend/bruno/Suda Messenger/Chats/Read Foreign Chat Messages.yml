@@ -1,0 +1,31 @@
+info:
+  name: Read Foreign Chat Messages
+  type: http
+  seq: 14
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/chats/00000000-0000-0000-0000-000000000000/messages?limit=50&offset=0"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 500", function() {
+          expect(res.getStatus()).to.equal(500);
+        });
+
+        test("Error mentions forbidden", function() {
+          const msg = res.getBody().message || "";
+          const blocked = msg.includes("forbidden") || msg.includes("not a member");
+          expect(blocked).to.be.true;
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

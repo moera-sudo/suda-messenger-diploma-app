@@ -1,0 +1,40 @@
+info:
+  name: Link App
+  type: http
+  seq: 11
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/channels/{{test_channel_id}}/apps"
+  body:
+    type: json
+    data: |-
+      {
+        "app_url": "https://example.com/app",
+        "app_name": "Test App"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_app_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+        test("Has app id", function() {
+          expect(res.getBody().id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

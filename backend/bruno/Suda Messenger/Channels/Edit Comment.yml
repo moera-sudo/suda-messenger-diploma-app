@@ -1,0 +1,31 @@
+info:
+  name: Edit Comment
+  type: http
+  seq: 8
+
+http:
+  method: PUT
+  url: "{{base_url}}{{messenger_prefix}}/channels/comments/{{test_comment_id}}"
+  body:
+    type: json
+    data: |-
+      {
+        "text": "Updated comment text"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

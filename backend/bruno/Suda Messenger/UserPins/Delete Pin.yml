@@ -1,0 +1,25 @@
+info:
+  name: Delete Pin
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{base_url}}{{messenger_prefix}}/user/pins/{{test_pin_id}}"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

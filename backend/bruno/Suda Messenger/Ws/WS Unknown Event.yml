@@ -1,0 +1,26 @@
+info:
+  name: WS Unknown Event
+  type: websocket
+  seq: 8
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: json
+    data: |-
+      {
+        "type": "BANANA",
+        "payload": {}
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Connection stays open after unknown event", function() {
+          expect(res.getStatus()).to.equal(101);
+        });
+
+settings:
+  timeout: 3000

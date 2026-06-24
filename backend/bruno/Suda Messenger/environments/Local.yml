@@ -1,0 +1,62 @@
+name: Local
+variables:
+  - name: base_url
+    value: http://localhost:8080
+  - name: messenger_prefix
+    value: /api/v1/messenger
+  - name: media_prefix
+    value: /api/v1/media
+  - name: application_prefix
+    value: /api/v1/apps
+  - name: transaction_prefix
+    value: /api/v1/tx
+  - name: access_token
+    value: ""
+  - name: refresh_token
+    value: ""
+  - name: test_user_id
+    value: ""
+  - name: test_user_id_2
+    value: 1fd58e64-d326-4c39-8cd0-fc1a7e68363c
+  - name: test_email
+    value: smoker@example.com
+  - name: test_password
+    value: testpass123
+  - name: test_username
+    value: "@smoker"
+  - name: test_display_name
+    value: smoker
+  - name: test_email_2
+    value: snoopdog@example.com
+  - name: test_password_2
+    value: testpass123
+  - name: test_username_2
+    value: "@snoopdog"
+  - name: test_display_name_2
+    value: snoopdog
+  - name: test_media_id
+    value: ""
+  - name: test_upload_url
+    value: ""
+  - name: test_chat_id
+    value: ""
+  - name: test_direct_chat_id
+    value: ""
+  - name: test_group_chat_id
+    value: ""
+  - name: test_saved_chat_id
+    value: ""
+  - name: test_message_id
+    value: ""
+  - name: test_channel_id
+    value: ""
+  - name: test_purchase_id
+    value: ""
+  - name: test_donation_tx_hash
+    value: ""
+  - name: test_comment_id
+    value: ""
+  - name: test_app_id
+    value: ""
+  - name: test_pin_id
+    value: ""

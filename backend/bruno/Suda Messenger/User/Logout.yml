@@ -1,0 +1,34 @@
+info:
+  name: Logout
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/user/logout"
+  body:
+    type: json
+    data: |-
+      {
+        "refresh_token": "{{refresh_token}}",
+        "fcm_token": "test-fcm-token-bruno-12345"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is USER_LOGGED_OUT", function() {
+          expect(res.getBody().action).to.equal("USER_LOGGED_OUT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

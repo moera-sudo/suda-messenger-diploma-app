@@ -1,0 +1,38 @@
+info:
+  name: Send To Foreign Chat
+  type: http
+  seq: 13
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/00000000-0000-0000-0000-000000000000/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "I should not be able to send this",
+        "type": "TEXT"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 500", function() {
+          expect(res.getStatus()).to.equal(500);
+        });
+
+        test("Error mentions forbidden or membership", function() {
+          const msg = res.getBody().message || "";
+          const blocked = msg.includes("forbidden") || msg.includes("not a member") || msg.includes("membership");
+          expect(blocked).to.be.true;
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

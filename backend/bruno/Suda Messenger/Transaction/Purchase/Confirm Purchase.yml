@@ -1,0 +1,44 @@
+info:
+  name: Confirm Purchase
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}{{transaction_prefix}}/purchase/{{test_purchase_id}}/confirm"
+  body:
+    type: json
+    data: |-
+      {
+        "card_number": "4000000000000000",
+        "cvv": "123"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 200) {
+          bru.setEnvVar("test_donation_tx_hash", res.getBody().tx_hash);
+        }
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+        test("Has tx_hash", function() {
+          expect(res.getBody().tx_hash).to.be.a("string");
+          expect(res.getBody().tx_hash).to.match(/^0x/);
+        });
+        test("Status is COMPLETED", function() {
+          expect(res.getBody().status).to.equal("COMPLETED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 10000
+  followRedirects: true
+  maxRedirects: 5

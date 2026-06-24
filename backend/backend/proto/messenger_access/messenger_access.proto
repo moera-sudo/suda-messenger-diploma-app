@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package messenger_access;
+
+option go_package = "github.com/moera-sudo/backend/backend/proto/messenger_access;messenger_access";
+
+// ===================================================
+// Messenger Access Service
+// Реализуется в messenger-service.
+// Вызывается из media-service для проверки доступа к приватным файлам.
+//
+// Flow:
+//   1. Клиент -> media-service: GET /api/media/:id/url
+//   2. media-service видит is_private=true, находит entity_link (MESSAGE, msg_id)
+//   3. media-service -> messenger-service: CheckEntityAccess(user_id, MESSAGE, msg_id)
+//   4. messenger-service: msg_id -> chat_id -> проверяет chat_members
+//   5. Возвращает has_access = true/false
+// ===================================================
+service MessengerAccessService {
+  rpc CheckEntityAccess(CheckEntityAccessRequest) returns (CheckEntityAccessResponse);
+}
+
+message CheckEntityAccessRequest {
+  string user_id = 1;
+  string entity_type = 2;       // MESSAGE, CHAT_AVATAR
+  string entity_id = 3;         // message_id, chat_id
+}
+
+message CheckEntityAccessResponse {
+  bool   has_access = 1;
+  string reason = 2;            // "not_a_member", "chat_not_found", "message_not_found"
+}

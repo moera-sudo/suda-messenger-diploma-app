@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package transaction;
+
+option go_package = "github.com/moera-sudo/backend/backend/proto/transaction;transaction";
+
+// ════════════════════════════════════════════════════════════
+//  Transaction Service (gRPC)
+//
+//  Custodial crypto operations on Hyperledger Besu (chainId 1337).
+//  Все методы вызываются ИЗ Messenger Service.
+//
+//  Flows:
+//    1. Регистрация юзера:
+//       Messenger.auth.Register → CreateWalletForUser → возвращает address
+//
+//    2. Создание канала:
+//       Messenger.chat.CreateChannel → CreateWalletForChannel → address
+//       Этот address используется как treasury для донатов канала.
+//
+//    3. UI кошелька / профиля:
+//       Messenger.user.GetMe → GetWallet (быстро, без RPC к Besu)
+//                            → GetBalance (с RPC к Besu, обновляет кеш)
+//
+//    4. Подписка на gated-канал / вступление в gated-чат:
+//       Messenger.channel.Subscribe → CheckTokenGating → passed=true/false
+//
+//  Обратное направление (Transaction → Messenger) описано в
+//  proto/transaction_access/service.proto.
+// ════════════════════════════════════════════════════════════
+
+service TransactionService {
+  // Создать кастодиальный кошелёк для юзера. Идемпотентен:
+  // если уже есть — вернёт существующий address и existed=true.
+  rpc CreateWalletForUser(CreateUserWalletRequest) returns (WalletResponse);
+
+  // Создать кастодиальный кошелёк для канала (treasury).
+  // Идемпотентен. Адрес используется как to-адрес для донатов канала
+  // и как from-адрес при создании квестов/сборов от имени канала.
+  rpc CreateWalletForChannel(CreateChannelWalletRequest) returns (WalletResponse);
+
+  // Получить адрес кошелька юзера (из БД, без RPC к Besu).
+  rpc GetWallet(UserRequest) returns (WalletResponse);
+
+  // Получить адрес кошелька канала.
+  rpc GetChannelWallet(ChannelRequest) returns (WalletResponse);
+
+  // Получить on-chain баланс SUDA у юзера.
+  // Делает SudaToken.balanceOf() на Besu, обновляет кеш в Postgres.
+  rpc GetBalance(UserRequest) returns (BalanceResponse);
+
+  // Проверить правило токен-гейтинга для чата/канала.
+  //   required=false  → правила нет, пропускаем.
+  //   required=true,  passed=true   → юзер проходит.
+  //   required=true,  passed=false  → юзер не проходит, reason указывает причину.
+  //   price_wei       → цена платной подписки (если канал платный), "0" иначе.
+  rpc CheckTokenGating(GatingRequest) returns (GatingResponse);
+
+  // Списать с юзера цену платной подписки на PUBLIC-канал в treasury канала.
+  // Вызывается Messenger.channel.Subscribe для платного канала ДО AddMember.
+  // Ошибка, если у канала нет правила с ценой > 0 (не платный канал).
+  rpc ChargeChannelSubscription(SubscriptionRequest) returns (SubscriptionResponse);
+}
+
+// ──────────────────────────────────────────────────────────
+//  Requests
+// ──────────────────────────────────────────────────────────
+
+message CreateUserWalletRequest {
+  string user_id = 1;
+}
+
+message CreateChannelWalletRequest {
+  string channel_id = 1;
+}
+
+message UserRequest {
+  string user_id = 1;
+}
+
+message ChannelRequest {
+  string channel_id = 1;
+}
+
+message GatingRequest {
+  string chat_id = 1;
+  string user_id = 2;
+}
+
+message SubscriptionRequest {
+  string user_id = 1;
+  string channel_id = 2;
+}
+
+// ──────────────────────────────────────────────────────────
+//  Responses
+// ──────────────────────────────────────────────────────────
+
+message WalletResponse {
+  string address = 1;   // 0x... EVM address (42 chars: "0x" + 40 hex)
+  bool   existed = 2;   // true = кошелёк уже был, false = создан в этом вызове
+}
+
+message BalanceResponse {
+  string suda_balance_wei = 1;  // uint256 как строка (wei, 18 decimals)
+  int32  decimals = 2;          // всегда 18 для SUDA
+  string address = 3;           // адрес для удобства логирования/дебага
+}
+
+message GatingResponse {
+  bool   required = 1;
+  bool   passed = 2;
+  string min_balance_wei = 3;
+  string user_balance_wei = 4;
+  // reason values:
+  //   "ok"                    — required=false ИЛИ passed=true
+  //   "no_wallet"             — у юзера нет кошелька (не зарегистрирован в Transaction)
+  //   "insufficient_balance"  — баланса не хватает
+  //   "nft_required"          — нужен NFT из коллекции, его нет
+  string reason = 5;
+  string price_wei = 6;  // цена платной подписки в wei ("0" = не платный)
+}
+
+message SubscriptionResponse {
+  string tx_hash = 1;    // hash транзакции списания (async-подтверждение через observer)
+  string price_wei = 2;  // списанная цена в wei
+}

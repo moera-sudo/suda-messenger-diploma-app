@@ -1,0 +1,36 @@
+info:
+  name: Update Profile
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: "{{base_url}}{{messenger_prefix}}/user/profile"
+  body:
+    type: json
+    data: |-
+      {
+        "display_name": "Updated Name",
+        "bio": "Hello from Bruno tests!",
+        "first_name": "Test",
+        "last_name": "User"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is PROFILE_UPDATED", function() {
+          expect(res.getBody().action).to.equal("PROFILE_UPDATED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

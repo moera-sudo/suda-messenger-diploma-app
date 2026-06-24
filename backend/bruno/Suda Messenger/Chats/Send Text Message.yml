@@ -1,0 +1,67 @@
+info:
+  name: Send Text Message
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Hello from Bruno tests!",
+        "type": "TEXT",
+        "client_side_id": "bruno-test-msg-001"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_message_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Has message ID", function() {
+          expect(res.getBody().id).to.be.a("number");
+          expect(res.getBody().id).to.be.greaterThan(0);
+        });
+
+        test("Content matches", function() {
+          expect(res.getBody().content).to.equal("Hello from Bruno tests!");
+        });
+
+        test("Type is TEXT", function() {
+          expect(res.getBody().type).to.equal("TEXT");
+        });
+
+        test("Status is SENT", function() {
+          expect(res.getBody().status).to.equal("SENT");
+        });
+
+        test("Chat ID matches", function() {
+          expect(res.getBody().chat_id).to.equal(bru.getEnvVar("test_direct_chat_id"));
+        });
+
+        test("Sender is current user", function() {
+          expect(res.getBody().sender_id).to.equal(bru.getEnvVar("test_user_id"));
+        });
+
+        test("Client side ID echoed back", function() {
+          expect(res.getBody().client_side_id).to.equal("bruno-test-msg-001");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

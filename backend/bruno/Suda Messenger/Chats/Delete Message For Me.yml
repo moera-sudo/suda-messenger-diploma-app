@@ -1,0 +1,27 @@
+info:
+  name: Delete Message For Me
+  type: http
+  seq: 17
+
+http:
+  method: DELETE
+  url: "{{base_url}}{{messenger_prefix}}/messages/{{test_message_id}}?for_everyone=false"
+  body:
+    type: none
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 204", function() {
+          expect(res.getStatus()).to.equal(204);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

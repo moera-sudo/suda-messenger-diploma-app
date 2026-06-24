@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package transaction_access;
+
+option go_package = "github.com/moera-sudo/backend/backend/proto/transaction_access;transaction_access";
+
+// ════════════════════════════════════════════════════════════
+//  Transaction Access Service (gRPC)
+//
+//  Реализуется в messenger-service.
+//  Вызывается из transaction-service в двух сценариях:
+//
+//  1. Username resolving:
+//     Юзер из Wallet WebApp шлёт перевод на @john →
+//     Transaction вызывает ResolveUsername → получает user_id и address →
+//     подписывает SudaToken.transfer() на этот адрес.
+//
+//  2. Уведомления о on-chain событиях:
+//     Observer внутри Transaction ловит событие из чейна (Transfer,
+//     QuestApproved, NFTMinted и т.д.) → вызывает NotifyUserEvent →
+//     Messenger одновременно:
+//       а) шлёт WS-event адресату через WSHub (если онлайн);
+//       б) если в запросе указан target_chat_id и create_message=true —
+//          создаёт system message в чате (карточка для истории).
+//
+//  3. Канал-permission проверки:
+//     Если действие над кошельком канала требует прав OWNER/ADMIN
+//     (например withdraw из treasury), Transaction проверяет
+//     через CheckChannelPermission прежде чем подписать транзакцию.
+// ════════════════════════════════════════════════════════════
+
+service TransactionAccessService {
+  // Резолвит username в user_id + EVM address (если у юзера есть кошелёк).
+  rpc ResolveUsername(ResolveUsernameRequest) returns (ResolveUsernameResponse);
+
+  // Уведомить юзера о событии. Слитный метод: один вызов делает
+  // и WS-нотификацию, и (опционально) system message в чате.
+  rpc NotifyUserEvent(NotifyUserEventRequest) returns (NotifyUserEventResponse);
+
+  // Проверка прав юзера в канале (для управления treasury канала).
+  rpc CheckChannelPermission(ChannelPermissionRequest) returns (ChannelPermissionResponse);
+
+  // Проверка членства группы юзеров в чате.
+  //
+  // Используется в transaction-service перед broadcast'ом transfer-in-chat,
+  // чтобы убедиться что и отправитель, и получатель — участники этого чата.
+  // Возвращает результат для каждого user_id, чтобы вызывающий мог отличить
+  // «отправитель не в чате» от «получатель не в чате».
+  rpc CheckChatMembership(ChatMembershipRequest) returns (ChatMembershipResponse);
+
+  // Batch-резолв user_id → username + display_name.
+  //
+  // Используется в transaction-service для treasury-статистики канала:
+  // top-донатеры и список донатов хранят только from_user_id, а UI нужны
+  // username'ы. Несуществующие id просто отсутствуют в ответе.
+  rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse);
+}
+
+// ──────────────────────────────────────────────────────────
+//  Username resolving
+// ──────────────────────────────────────────────────────────
+
+message ResolveUsernameRequest {
+  string username = 1;  // без @, например "john"
+}
+
+message ResolveUsernameResponse {
+  bool   found = 1;
+  string user_id = 2;       // UUID юзера в messenger_users (если found=true)
+  string display_name = 3;  // для UI
+  // wallet_address пустой, если у юзера ещё нет кошелька в transaction-service.
+  // Тогда вызывающий должен либо отказать в операции, либо сначала вызвать
+  // CreateWalletForUser (но это противоречит lazy-логике, так что лучше отказать).
+  string wallet_address = 4;
+}
+
+// ──────────────────────────────────────────────────────────
+//  Notify (WS + optional system message)
+// ──────────────────────────────────────────────────────────
+
+// event_type values (фронт мапит на UI-карточки):
+//   SUDA_RECEIVED          — входящий перевод SUDA
+//   SUDA_SENT              — исходящий перевод (для списка операций)
+//   NFT_RECEIVED           — получен NFT (gift или покупка)
+//   NFT_SOLD               — твой NFT купили
+//   DONATION_RECEIVED      — донат на канал, где ты owner/admin
+//   QUEST_CLAIMED          — твой квест взяли (creator получает)
+//   QUEST_SUBMITTED        — исполнитель сдал работу
+//   QUEST_APPROVED         — квест подтверждён, награда выплачена
+//   QUEST_CANCELLED        — квест отменён
+//   QUEST_EXPIRED          — дедлайн прошёл, refund
+//   FUNDRAISE_CONTRIBUTION — твой сбор получил вклад
+//   FUNDRAISE_GOAL_REACHED — цель сбора достигнута
+//   FUNDRAISE_EXPIRED      — сбор истёк, можно делать refund
+//
+// payload_json — JSON-строка, конкретная схема зависит от event_type.
+// Примеры:
+//   SUDA_RECEIVED:       {"from_user_id":"...","from_username":"alice","amount_wei":"100000...","tx_hash":"0x..."}
+//   NFT_RECEIVED:        {"from_user_id":"...","nft_item_id":"...","nft_name":"Cool Sticker","media_id":"..."}
+//   DONATION_RECEIVED:   {"channel_id":"...","from_user_id":"...","amount_wei":"...","message":"thanks!","tx_hash":"..."}
+//   QUEST_APPROVED:      {"quest_id":"...","reward_wei":"500000..."}
+message NotifyUserEventRequest {
+  string user_id = 1;        // получатель уведомления
+  string event_type = 2;
+  string payload_json = 3;
+
+  // Если указан — Messenger дополнительно создаёт system message
+  // в этом чате (типа DONATION/NFT_GIFT/QUEST/FUNDRAISE) с тем же payload.
+  // Пусто — только WS-уведомление, без записи в историю чата.
+  string target_chat_id = 4;
+
+  // Тип system message (если target_chat_id указан).
+  // Значения соответствуют messenger_messages.type:
+  //   DONATION | NFT_GIFT | QUEST | FUNDRAISE
+  // Пусто — не создавать system message, даже если target_chat_id есть.
+  string system_message_type = 5;
+}
+
+message NotifyUserEventResponse {
+  bool ws_delivered = 1;        // true если юзер был онлайн и WS отправлен
+  bool message_created = 2;     // true если был создан system message
+  string system_message_id = 3; // id созданного сообщения (если был создан)
+}
+
+// ──────────────────────────────────────────────────────────
+//  Channel permission check
+// ──────────────────────────────────────────────────────────
+
+// permission values:
+//   OWNER          — только владелец канала
+//   OWNER_OR_ADMIN — владелец или один из админов
+//   MEMBER         — любой участник (для квестов: создавать может только админ,
+//                    но claim'ить может любой подписчик канала)
+message ChannelPermissionRequest {
+  string user_id = 1;
+  string channel_id = 2;
+  string permission = 3;
+}
+
+message ChannelPermissionResponse {
+  bool granted = 1;
+  // reason: "ok" | "not_a_member" | "not_admin" | "not_owner" | "channel_not_found"
+  string reason = 2;
+}
+
+// ──────────────────────────────────────────────────────────
+//  Chat membership check (batch)
+// ──────────────────────────────────────────────────────────
+
+message ChatMembershipRequest {
+  string chat_id = 1;
+  // Массив user_id для проверки в одном запросе.
+  // Используется например для transfer-in-chat: один вызов проверяет
+  // что и отправитель, и получатель — члены чата.
+  repeated string user_ids = 2;
+}
+
+message ChatMembershipResponse {
+  // chat_exists=false → чата нет, все members=false.
+  bool chat_exists = 1;
+
+  // Результаты в том же порядке, что user_ids в запросе.
+  // members[i].is_member соответствует user_ids[i].
+  repeated UserMembership members = 2;
+}
+
+message UserMembership {
+  string user_id = 1;
+  bool   is_member = 2;
+  string role = 3;        // если is_member=true: OWNER | ADMIN | MEMBER | SUBSCRIBER
+}
+
+// ──────────────────────────────────────────────────────────
+//  Batch user resolving (user_id → username)
+// ──────────────────────────────────────────────────────────
+
+message GetUsersByIDsRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUsersByIDsResponse {
+  // Только найденные юзеры. Порядок не гарантирован, маппить по user_id.
+  repeated UserBrief users = 1;
+}
+
+message UserBrief {
+  string user_id = 1;
+  string username = 2;
+  string display_name = 3;
+}

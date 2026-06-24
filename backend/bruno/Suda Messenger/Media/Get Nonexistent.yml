@@ -1,0 +1,29 @@
+info:
+  name: Get Nonexistent
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}{{media_prefix}}/00000000-0000-0000-0000-000000000000"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 404", function() {
+          expect(res.getStatus()).to.equal(404);
+        });
+
+        test("Error is NOT_FOUND", function() {
+          expect(res.getBody().error).to.equal("NOT_FOUND");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

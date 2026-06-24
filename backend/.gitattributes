@@ -1,0 +1,31 @@
+# Default: auto-detect line endings, normalize to LF in repo
+* text=auto
+
+# Force LF for files that run inside Linux containers / shell
+*.sh        text eol=lf
+*.bash      text eol=lf
+Dockerfile  text eol=lf
+*.dockerfile text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.conf      text eol=lf
+*.nginx     text eol=lf
+
+# JSON and Go — also LF for consistency
+*.json      text eol=lf
+*.go        text eol=lf
+*.mod       text eol=lf
+*.sum       text eol=lf
+*.proto     text eol=lf
+
+# Binary — never touch
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary
+firebase-adminsdk.json binary

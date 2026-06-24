@@ -1,0 +1,33 @@
+info:
+  name: WS Read Message
+  type: websocket
+  seq: 4
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: json
+    data: |-
+      {
+        "type": "READ_MESSAGE",
+        "payload": {
+          "chat_id": "{{test_direct_chat_id}}",
+          "message_id": {{test_message_id}}
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("No error received", function() {
+          const msg = res.getMessage();
+          if (msg) {
+            const parsed = JSON.parse(msg);
+            expect(parsed.type).to.not.equal("ERROR");
+          }
+        });
+
+settings:
+  timeout: 3000

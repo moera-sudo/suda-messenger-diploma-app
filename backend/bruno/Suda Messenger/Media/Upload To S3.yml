@@ -1,0 +1,32 @@
+info:
+  name: Upload To S3
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: "{{test_upload_url}}"
+  headers:
+    - name: Content-Type
+      value: image/jpeg
+  body:
+    type: file
+    data:
+      - filePath: /home/vedareom/media/wallpapers/reze-rain.jpg
+        contentType: image/jpeg
+        selected: true
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 (S3 accepted)", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

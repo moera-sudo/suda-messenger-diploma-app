@@ -1,0 +1,908 @@
+basePath: /api/v1
+definitions:
+  github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.MessageRespond:
+    properties:
+      action:
+        type: string
+      message:
+        type: string
+    type: object
+  internal_features_donation_delivery_http.DonateRequest:
+    properties:
+      amount_wei:
+        type: string
+      chat_id:
+        type: string
+      message:
+        maxLength: 200
+        type: string
+      to_channel_id:
+        type: string
+      to_username:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - amount_wei
+    type: object
+  internal_features_donation_delivery_http.DonateResponse:
+    properties:
+      amount_wei:
+        type: string
+      from_address:
+        type: string
+      is_channel:
+        type: boolean
+      submitted_at:
+        type: string
+      to_address:
+        type: string
+      to_channel_id:
+        type: string
+      to_user_id:
+        type: string
+      tx_hash:
+        type: string
+    type: object
+  internal_features_gating_delivery_http.CreateRuleRequest:
+    properties:
+      chat_id:
+        type: string
+      min_suda_balance_wei:
+        type: string
+      required_nft_collection_id:
+        type: string
+    required:
+    - chat_id
+    - min_suda_balance_wei
+    type: object
+  internal_features_gating_delivery_http.RuleResponse:
+    properties:
+      chat_id:
+        type: string
+      has_rule:
+        type: boolean
+      min_suda_balance_wei:
+        type: string
+      required_nft_collection_id:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.ConfirmRequest:
+    properties:
+      card_number:
+        type: string
+      cardholder_name:
+        type: string
+      cvv:
+        type: string
+      expiry_month:
+        type: string
+      expiry_year:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.ConfirmResponse:
+    properties:
+      completed_at:
+        type: string
+      purchase_id:
+        type: string
+      status:
+        type: string
+      suda_amount_wei:
+        type: string
+      tx_hash:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.HistoryItem:
+    properties:
+      completed_at:
+        type: string
+      created_at:
+        type: string
+      failure_reason:
+        type: string
+      fiat_amount:
+        type: string
+      fiat_currency:
+        type: string
+      id:
+        type: string
+      package_code:
+        type: string
+      payment_method:
+        type: string
+      status:
+        type: string
+      suda_amount_wei:
+        type: string
+      tx_hash:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.HistoryResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/internal_features_purchase_delivery_http.HistoryItem'
+        type: array
+    type: object
+  internal_features_purchase_delivery_http.InitiateRequest:
+    properties:
+      package_code:
+        maxLength: 50
+        minLength: 1
+        type: string
+      payment_method:
+        enum:
+        - CARD
+        - APPLE_PAY
+        - GOOGLE_PAY
+        type: string
+    required:
+    - package_code
+    type: object
+  internal_features_purchase_delivery_http.InitiateResponse:
+    properties:
+      fiat_amount:
+        type: string
+      fiat_currency:
+        type: string
+      package_code:
+        type: string
+      payment_method:
+        type: string
+      purchase_id:
+        type: string
+      status:
+        type: string
+      suda_amount_wei:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.PackageDTO:
+    properties:
+      code:
+        type: string
+      fiat_currency:
+        type: string
+      fiat_price:
+        type: string
+      suda_amount:
+        type: integer
+      suda_amount_wei:
+        type: string
+      title:
+        type: string
+    type: object
+  internal_features_purchase_delivery_http.PackagesResponse:
+    properties:
+      packages:
+        items:
+          $ref: '#/definitions/internal_features_purchase_delivery_http.PackageDTO'
+        type: array
+    type: object
+  internal_features_wallet_delivery_http.ChannelWalletResponse:
+    properties:
+      address:
+        type: string
+      channel_id:
+        type: string
+      decimals:
+        type: integer
+      suda_balance_wei:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.DonationDTO:
+    properties:
+      amount_wei:
+        type: string
+      created_at:
+        type: string
+      from_address:
+        type: string
+      from_display_name:
+        type: string
+      from_user_id:
+        type: string
+      from_username:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      tx_hash:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.DonationsListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/internal_features_wallet_delivery_http.DonationDTO'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_features_wallet_delivery_http.HistoryItem:
+    properties:
+      amount_wei:
+        type: string
+      block_number:
+        type: integer
+      confirmed_at:
+        type: string
+      from_address:
+        type: string
+      from_user_id:
+        type: string
+      id:
+        type: string
+      log_index:
+        type: integer
+      note:
+        type: string
+      related_entity_id:
+        type: string
+      related_entity_type:
+        type: string
+      status:
+        type: string
+      to_address:
+        type: string
+      to_user_id:
+        type: string
+      tx_hash:
+        type: string
+      type:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.HistoryResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/internal_features_wallet_delivery_http.HistoryItem'
+        type: array
+    type: object
+  internal_features_wallet_delivery_http.MeResponse:
+    properties:
+      address:
+        type: string
+      decimals:
+        type: integer
+      suda_balance_wei:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.ResolveRequest:
+    properties:
+      username:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - username
+    type: object
+  internal_features_wallet_delivery_http.ResolveResponse:
+    properties:
+      display_name:
+        type: string
+      found:
+        type: boolean
+      user_id:
+        type: string
+      wallet_address:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.TopDonorDTO:
+    properties:
+      amount_wei:
+        type: string
+      display_name:
+        type: string
+      donation_count:
+        type: integer
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.TransferRequest:
+    properties:
+      amount_wei:
+        type: string
+      chat_id:
+        type: string
+      note:
+        maxLength: 200
+        type: string
+      to_username:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - amount_wei
+    - to_username
+    type: object
+  internal_features_wallet_delivery_http.TransferResponse:
+    properties:
+      amount_wei:
+        type: string
+      chat_id:
+        type: string
+      from_address:
+        type: string
+      submitted_at:
+        type: string
+      to_address:
+        type: string
+      to_user_id:
+        type: string
+      tx_hash:
+        type: string
+    type: object
+  internal_features_wallet_delivery_http.TreasuryResponse:
+    properties:
+      address:
+        type: string
+      channel_id:
+        type: string
+      decimals:
+        type: integer
+      suda_balance_wei:
+        type: string
+      top_donors:
+        items:
+          $ref: '#/definitions/internal_features_wallet_delivery_http.TopDonorDTO'
+        type: array
+      total_donations_count:
+        type: integer
+      total_donations_wei:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: 'REST API for Suda Transaction Service: custodial wallets, SUDA transfers,
+    donations, token-gating, purchases, treasury statistics.'
+  title: Suda Transaction Service API
+  version: "1.0"
+paths:
+  /donate:
+    post:
+      consumes:
+      - application/json
+      description: Send a SUDA donation. Exactly one of to_username or to_channel_id
+        must be set. Returns tx_hash immediately; observer indexes donation asynchronously
+        and emits DONATION_SENT/DONATION_RECEIVED WS events.
+      parameters:
+      - description: Donation parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_donation_delivery_http.DonateRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/internal_features_donation_delivery_http.DonateResponse'
+        "400":
+          description: invalid_request | cannot_donate_to_self | recipient_has_no_wallet
+            | insufficient_balance
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: sender_not_in_chat | recipient_not_in_chat
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: recipient_not_found | channel_wallet_not_found | wallet_not_found
+            | chat_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Donate SUDA to a user or channel
+      tags:
+      - Donation
+  /gating/rule:
+    post:
+      consumes:
+      - application/json
+      description: Sets a token-gating rule for a channel (minimum SUDA balance and/or
+        required NFT collection). Channel OWNER only.
+      parameters:
+      - description: Gating rule parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_gating_delivery_http.CreateRuleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_gating_delivery_http.RuleResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: not_owner
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create or update a gating rule
+      tags:
+      - Gating
+  /gating/rule/{chat_id}:
+    delete:
+      description: Removes the gating rule for a channel. Channel OWNER only.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: chat_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: not_owner
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete gating rule
+      tags:
+      - Gating
+    get:
+      description: Returns the current gating rule (if any). Available to any authenticated
+        user — the threshold is public.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: chat_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_gating_delivery_http.RuleResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get gating rule for a channel
+      tags:
+      - Gating
+  /purchase/{id}/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Simulates a payment for an existing PENDING purchase. Treasury
+        broadcasts the SUDA Transfer; observer creates a PURCHASE_COMPLETED WS event
+        for the buyer.
+      parameters:
+      - description: Purchase UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Card details (not validated in simulation)
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_features_purchase_delivery_http.ConfirmRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_purchase_delivery_http.ConfirmResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: purchase_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "409":
+          description: already_handled
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "424":
+          description: wallet_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "429":
+          description: rate_limited
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Confirm a SUDA purchase
+      tags:
+      - Purchase
+  /purchase/history:
+    get:
+      description: Paginated list of purchases for the authenticated user (any status).
+      parameters:
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_purchase_delivery_http.HistoryResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my purchase history
+      tags:
+      - Purchase
+  /purchase/initiate:
+    post:
+      consumes:
+      - application/json
+      description: Creates a PENDING purchase. Returns purchase_id for follow-up Confirm
+        call.
+      parameters:
+      - description: Package code + payment method
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_purchase_delivery_http.InitiateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_purchase_delivery_http.InitiateResponse'
+        "400":
+          description: invalid_request | unknown_package
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Initiate a SUDA purchase
+      tags:
+      - Purchase
+  /purchase/packages:
+    get:
+      description: Public catalog of SUDA purchase packages with fiat prices.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_purchase_delivery_http.PackagesResponse'
+      security:
+      - BearerAuth: []
+      summary: List SUDA purchase packages
+      tags:
+      - Purchase
+  /wallet/channel/{channel_id}:
+    get:
+      description: Returns the channel's treasury wallet address and on-chain SUDA
+        balance. Available to channel OWNER or ADMIN.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: channel_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.ChannelWalletResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: wallet_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get channel treasury wallet
+      tags:
+      - Wallet
+  /wallet/channel/{channel_id}/donations:
+    get:
+      description: Paginated list of donations to a channel with resolved usernames.
+        OWNER/ADMIN only.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: channel_id
+        required: true
+        type: string
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.DonationsListResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List channel donations
+      tags:
+      - Treasury
+  /wallet/channel/{channel_id}/treasury:
+    get:
+      description: 'Aggregated donation stats for a channel: on-chain balance, total
+        donations count/amount, top donors. OWNER/ADMIN only.'
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: channel_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.TreasuryResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: wallet_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get channel treasury statistics
+      tags:
+      - Treasury
+  /wallet/history:
+    get:
+      description: Returns confirmed on-chain transactions involving the user's wallet
+        (transfers, donations, purchases).
+      parameters:
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.HistoryResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my transaction history
+      tags:
+      - Wallet
+  /wallet/me:
+    get:
+      description: Returns the authenticated user's custodial wallet address and on-chain
+        SUDA balance.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.MeResponse'
+        "404":
+          description: wallet_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my wallet
+      tags:
+      - Wallet
+  /wallet/resolve:
+    post:
+      consumes:
+      - application/json
+      description: Looks up a user by username and returns their user_id, display_name
+        and wallet_address (if any).
+      parameters:
+      - description: Username to resolve
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_wallet_delivery_http.ResolveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.ResolveResponse'
+        "400":
+          description: invalid_request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Resolve username to wallet
+      tags:
+      - Wallet
+  /wallet/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Custodial P2P transfer of SUDA tokens. Returns tx_hash immediately
+        (async confirmation via WS event SUDA_RECEIVED/SUDA_SENT). If chat_id is provided,
+        a system message is posted to that chat.
+      parameters:
+      - description: Transfer parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_wallet_delivery_http.TransferRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/internal_features_wallet_delivery_http.TransferResponse'
+        "400":
+          description: invalid_request | cannot_transfer_to_self | recipient_has_no_wallet
+            | insufficient_balance
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: sender_not_in_chat | recipient_not_in_chat
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: recipient_not_found | wallet_not_found | chat_not_found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: internal_error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_transaction-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Transfer SUDA to a user
+      tags:
+      - Wallet
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,0 +1,38 @@
+info:
+  name: Upload Invalid Kind
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}{{media_prefix}}/upload/init"
+  body:
+    type: json
+    data: |-
+      {
+        "kind": "NONEXISTENT_KIND",
+        "content_type": "image/jpeg",
+        "original_name": "bad.jpg",
+        "is_private": false
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 400", function() {
+          expect(res.getStatus()).to.equal(400);
+        });
+
+        test("Error mentions unknown kind", function() {
+          expect(res.getBody().message).to.include("unknown media kind");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

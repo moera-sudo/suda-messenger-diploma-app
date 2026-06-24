@@ -1,0 +1,53 @@
+info:
+  name: Forward Message
+  type: http
+  seq: 12
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/forward"
+  body:
+    type: json
+    data: |-
+      {
+        "from_chat_id": "{{test_direct_chat_id}}",
+        "to_chat_id": "{{test_group_chat_id}}",
+        "message_id": {{test_message_id}}
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Has forwarded_from_chat", function() {
+          expect(res.getBody().forwarded_from_chat).to.equal(bru.getEnvVar("test_direct_chat_id"));
+        });
+
+        test("Has forwarded_from_msg", function() {
+          expect(res.getBody().forwarded_from_msg).to.be.a("number");
+        });
+
+        test("Content matches original", function() {
+          expect(res.getBody().content).to.equal("Hello from Bruno tests!");
+        });
+
+        test("Sent to target chat", function() {
+          expect(res.getBody().chat_id).to.equal(bru.getEnvVar("test_group_chat_id"));
+        });
+
+        test("Sender is current user", function() {
+          expect(res.getBody().sender_id).to.equal(bru.getEnvVar("test_user_id"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

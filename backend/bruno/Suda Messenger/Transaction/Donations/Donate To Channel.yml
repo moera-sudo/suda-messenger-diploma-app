@@ -1,0 +1,43 @@
+info:
+  name: Donate To Channel
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}{{transaction_prefix}}/donate"
+  body:
+    type: json
+    data: |-
+      {
+        "to_channel_id": "{{test_channel_id}}",
+        "amount_wei": "5000000000000000000",
+        "message": "Keep up the great content!"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 202", function() {
+          expect(res.getStatus()).to.equal(202);
+        });
+        test("Has tx_hash", function() {
+          expect(res.getBody().tx_hash).to.be.a("string");
+          expect(res.getBody().tx_hash).to.match(/^0x/);
+        });
+        test("Is channel donation", function() {
+          expect(res.getBody().is_channel).to.equal(true);
+        });
+        test("Has to_channel_id", function() {
+          expect(res.getBody().to_channel_id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

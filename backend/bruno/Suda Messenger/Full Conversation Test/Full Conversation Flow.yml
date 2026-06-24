@@ -1,0 +1,121 @@
+info:
+  name: Full Conversation Flow
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Hello from Bruno!",
+        "type": "TEXT",
+        "client_side_id": "bruno-001"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const axios = require('axios');
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const directId = bru.getEnvVar("test_direct_chat_id");
+        const groupId = bru.getEnvVar("test_group_chat_id");
+        const savedId = bru.getEnvVar("test_saved_chat_id");
+        const mediaId = bru.getEnvVar("test_media_id");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+        const results = [];
+
+        const textMsgId = res.getBody().id;
+        bru.setEnvVar("test_message_id", textMsgId);
+
+        // ── IMAGE в direct (пустой content — только файл) ──
+        if (mediaId) {
+          const r = await axios.post(
+            baseUrl + prefix + "/chats/" + directId + "/messages",
+            { content: "", type: "IMAGE", attachment_media_id: mediaId, client_side_id: "bruno-002" },
+            { headers }
+          );
+          bru.setEnvVar("test_attachment_message_id", r.data.id);
+          results.push("✅ IMAGE in direct: id=" + r.data.id);
+        } else {
+          results.push("⚠️ IMAGE skipped: no test_media_id (run Media flow first)");
+        }
+
+        // ── DOCUMENT в direct ──
+        if (mediaId) {
+          const r = await axios.post(
+            baseUrl + prefix + "/chats/" + directId + "/messages",
+            { content: "Check this doc", type: "FILE", attachment_media_id: mediaId, client_side_id: "bruno-003" },
+            { headers }
+          );
+          results.push("✅ FILE in direct: id=" + r.data.id);
+        }
+
+        // ── REPLY на первое сообщение ──
+        const replyRes = await axios.post(
+          baseUrl + prefix + "/chats/" + directId + "/messages",
+          { content: "This is a reply!", type: "TEXT", reply_to_message_id: textMsgId, client_side_id: "bruno-004" },
+          { headers }
+        );
+        bru.setEnvVar("test_reply_message_id", replyRes.data.id);
+        results.push("✅ REPLY in direct: id=" + replyRes.data.id);
+
+        // ── TEXT в GROUP ──
+        if (groupId) {
+          const r = await axios.post(
+            baseUrl + prefix + "/chats/" + groupId + "/messages",
+            { content: "Hello group!", type: "TEXT", client_side_id: "bruno-005" },
+            { headers }
+          );
+          results.push("✅ TEXT in group: id=" + r.data.id);
+
+          // IMAGE в GROUP
+          if (mediaId) {
+            const r2 = await axios.post(
+              baseUrl + prefix + "/chats/" + groupId + "/messages",
+              { content: "", type: "IMAGE", attachment_media_id: mediaId, client_side_id: "bruno-006" },
+              { headers }
+            );
+            results.push("✅ IMAGE in group: id=" + r2.data.id);
+          }
+        }
+
+        // ── TEXT в SAVED ──
+        if (savedId) {
+          const r = await axios.post(
+            baseUrl + prefix + "/chats/" + savedId + "/messages",
+            { content: "Note to self", type: "TEXT", client_side_id: "bruno-007" },
+            { headers }
+          );
+          results.push("✅ TEXT in saved: id=" + r.data.id);
+        }
+
+        results.forEach(r => console.log(r));
+    - type: tests
+      code: |-
+        test("Text message sent to direct", function() {
+          expect(res.getStatus()).to.equal(201);
+          expect(res.getBody().content).to.equal("Hello from Bruno!");
+          expect(res.getBody().type).to.equal("TEXT");
+          expect(res.getBody().status).to.equal("SENT");
+          expect(res.getBody().sender_id).to.equal(bru.getEnvVar("test_user_id"));
+          expect(res.getBody().client_side_id).to.equal("bruno-001");
+          expect(res.getBody().id).to.be.greaterThan(0);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,65 @@
+info:
+  name: Block and Unblock User
+  type: http
+  seq: 21
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/users/block"
+  body:
+    type: json
+    data: |-
+      {
+        "user_id": "{{test_user_id_2}}"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is USER_BLOCKED", function() {
+          expect(res.getBody().action).to.equal("USER_BLOCKED");
+        });
+    - type: after-response
+      code: |-
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const userId2 = bru.getEnvVar("test_user_id_2");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+
+        const listRes = await fetch(baseUrl + prefix + "/users/blocked", {
+          method: "GET",
+          headers: { "Authorization": "Bearer " + token }
+        });
+        const blocked = await listRes.json();
+        const found = Array.isArray(blocked) && blocked.includes(userId2);
+        console.log("✅ Blocked list contains user2: " + found);
+
+        const unblockRes = await fetch(baseUrl + prefix + "/users/unblock", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ user_id: userId2 })
+        });
+
+        if (unblockRes.status === 200) {
+          console.log("✅ Unblock OK");
+        } else {
+          console.log("❌ Unblock failed: " + unblockRes.status);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

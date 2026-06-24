@@ -1,0 +1,3267 @@
+basePath: /
+definitions:
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.ForgotPasswordReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.LoginReq:
+    properties:
+      client_ip:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      user_agent:
+        type: string
+    required:
+    - client_ip
+    - email
+    - password
+    - user_agent
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.RefreshSessionReq:
+    properties:
+      client_ip:
+        type: string
+      refresh_token:
+        type: string
+      user_agent:
+        type: string
+    required:
+    - client_ip
+    - refresh_token
+    - user_agent
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.RegisterReq:
+    properties:
+      email:
+        type: string
+      name:
+        maxLength: 50
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        maxLength: 30
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.ResetPasswordReq:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - code
+    - email
+    - password
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.TokenResponse:
+    properties:
+      access_expires_in:
+        type: integer
+      access_token:
+        type: string
+      refresh_expires_in:
+        $ref: '#/definitions/time.Duration'
+      refresh_token:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.VerifyReq:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+    required:
+    - code
+    - email
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.WebappSessionReq:
+    properties:
+      init_data:
+        type: string
+    required:
+    - init_data
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.WebappSessionResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.AddCommentReq:
+    properties:
+      content:
+        maxLength: 4000
+        minLength: 1
+        type: string
+      reply_to_comment_id:
+        type: integer
+    required:
+    - content
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.ChannelAppLink:
+    properties:
+      added_at:
+        type: string
+      added_by:
+        type: string
+      app_id:
+        type: string
+      channel_id:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.ChannelComment:
+    properties:
+      channel_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      edited_at:
+        type: string
+      id:
+        type: integer
+      post_id:
+        type: integer
+      reply_to_comment_id:
+        type: integer
+      sender_display_name:
+        type: string
+      sender_id:
+        type: string
+      sender_username:
+        description: Дополнительные поля для UI (заполняются в JOIN)
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.CommentsListResponse:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.ChannelComment'
+        type: array
+      total:
+        type: integer
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.EditCommentReq:
+    properties:
+      content:
+        maxLength: 4000
+        minLength: 1
+        type: string
+    required:
+    - content
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.LinkAppReq:
+    properties:
+      app_id:
+        type: string
+    required:
+    - app_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.SubscriberInfo:
+    properties:
+      display_name:
+        type: string
+      is_online:
+        type: boolean
+      joined_at:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.UpdateChannelSettingsReq:
+    properties:
+      comments_enabled:
+        type: boolean
+      username:
+        maxLength: 32
+        minLength: 3
+        type: string
+      visibility:
+        enum:
+        - PUBLIC
+        - PRIVATE
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.AddMemberReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.BlockUserReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Chat:
+    properties:
+      avatar_media_id:
+        type: string
+      comments_enabled:
+        type: boolean
+      created_at:
+        type: string
+      creator_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      invite_link:
+        type: string
+      name:
+        type: string
+      subscriber_count:
+        type: integer
+      type:
+        type: string
+      username:
+        type: string
+      visibility:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatInfoResponse:
+    properties:
+      avatar_media_id:
+        type: string
+      comments_enabled:
+        type: boolean
+      created_at:
+        type: string
+      creator_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      invite_link:
+        type: string
+      member_count:
+        type: integer
+      members:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatMemberInfoResponse'
+        type: array
+      name:
+        type: string
+      online_count:
+        type: integer
+      pinned_messages:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.PinnedMessageInfoResponse'
+        type: array
+      subscriber_count:
+        type: integer
+      type:
+        type: string
+      username:
+        type: string
+      visibility:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatListItemResponse:
+    properties:
+      avatar_media_id:
+        type: string
+      comments_enabled:
+        type: boolean
+      created_at:
+        type: string
+      creator_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      interlocutor_avatar:
+        type: string
+      interlocutor_id:
+        type: string
+      interlocutor_name:
+        type: string
+      invite_link:
+        type: string
+      is_muted:
+        type: boolean
+      is_pinned:
+        type: boolean
+      last_message_content:
+        type: string
+      last_message_time:
+        type: string
+      member_count:
+        type: integer
+      name:
+        type: string
+      online_count:
+        type: integer
+      subscriber_count:
+        type: integer
+      type:
+        type: string
+      unread_count:
+        type: integer
+      username:
+        type: string
+      visibility:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatMediaResponse:
+    properties:
+      audio:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MediaItemResponse'
+        type: array
+      documents:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MediaItemResponse'
+        type: array
+      images:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MediaItemResponse'
+        type: array
+      links:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.LinkItemResponse'
+        type: array
+      videos:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MediaItemResponse'
+        type: array
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatMemberInfoResponse:
+    properties:
+      avatar_media_id:
+        type: string
+      display_name:
+        type: string
+      is_online:
+        type: boolean
+      last_seen_at:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Contact:
+    properties:
+      contact_id:
+        type: string
+      created_at:
+        type: string
+      custom_name:
+        type: string
+      owner_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.CreateChatReq:
+    properties:
+      description:
+        type: string
+      member_ids:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      target_id:
+        type: string
+      type:
+        enum:
+        - DIRECT
+        - GROUP
+        - SAVED
+        - CHANNEL
+        type: string
+      username:
+        maxLength: 32
+        minLength: 3
+        type: string
+      visibility:
+        description: Для каналов
+        enum:
+        - PUBLIC
+        - PRIVATE
+        type: string
+    required:
+    - type
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.EditMessageReq:
+    properties:
+      content:
+        type: string
+    required:
+    - content
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ForwardMessageReq:
+    properties:
+      from_chat_id:
+        type: string
+      message_id:
+        type: integer
+      to_chat_id:
+        type: string
+    required:
+    - from_chat_id
+    - message_id
+    - to_chat_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.LinkItemResponse:
+    properties:
+      created_at:
+        type: string
+      message_id:
+        type: integer
+      sender_id:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MediaItemResponse:
+    properties:
+      content_type:
+        type: string
+      created_at:
+        type: string
+      media_id:
+        type: string
+      message_id:
+        type: integer
+      original_name:
+        type: string
+      sender_id:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Message:
+    properties:
+      attachment_media_id:
+        type: string
+      chat_id:
+        type: string
+      client_side_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      edited_at:
+        type: string
+      forwarded_from_chat:
+        type: string
+      forwarded_from_msg:
+        type: integer
+      id:
+        type: integer
+      reply_to_message_id:
+        type: integer
+      sender_id:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MessageReaderInfoResponse:
+    properties:
+      display_name:
+        type: string
+      read_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MuteChatReq:
+    properties:
+      muted_until:
+        description: nil = mute forever
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.PinMessageReq:
+    properties:
+      message_id:
+        type: integer
+    required:
+    - message_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.PinnedMessageInfoResponse:
+    properties:
+      chat_id:
+        type: string
+      content:
+        type: string
+      message_id:
+        type: integer
+      pinned_at:
+        type: string
+      pinned_by:
+        type: string
+      sender_id:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.SendMessageReq:
+    properties:
+      attachment_media_id:
+        type: string
+      chat_id:
+        type: string
+      client_side_id:
+        type: string
+      content:
+        type: string
+      reply_to_message_id:
+        type: integer
+      type:
+        type: string
+    required:
+    - chat_id
+    - type
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.SetContactNameReq:
+    properties:
+      custom_name:
+        maxLength: 50
+        type: string
+      user_id:
+        type: string
+    required:
+    - custom_name
+    - user_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.UpdateChatReq:
+    properties:
+      avatar_media_id:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.UpdateMemberRoleReq:
+    properties:
+      role:
+        enum:
+        - ADMIN
+        - MEMBER
+        type: string
+    required:
+    - role
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendInfo:
+    properties:
+      avatar_media_id:
+        type: string
+      became_at:
+        description: ISO time when request was accepted
+        type: string
+      display_name:
+        type: string
+      is_online:
+        type: boolean
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendRequest:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      requester_id:
+        type: string
+      status:
+        type: string
+      target_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendRequestInfo:
+    properties:
+      created_at:
+        type: string
+      direction:
+        description: '"incoming" | "outgoing"'
+        type: string
+      other_avatar_media_id:
+        type: string
+      other_display_name:
+        type: string
+      other_user_id:
+        type: string
+      other_username:
+        type: string
+      request_id:
+        type: string
+      status:
+        description: PENDING / ACCEPTED / REJECTED / CANCELLED
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.RelationStatusResponse:
+    properties:
+      relation:
+        description: see RelationXxx constants
+        type: string
+      request_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.SendRequestReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.HideLastSeenReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.UpdatePreferencesReq:
+    properties:
+      accept_gifts_from:
+        description: NEW
+        enum:
+        - EVERYONE
+        - CONTACTS
+        - NOBODY
+        type: string
+      auto_download_media:
+        type: boolean
+      avatar_visibility:
+        enum:
+        - EVERYONE
+        - CONTACTS
+        - NOBODY
+        type: string
+      chat_font_size:
+        enum:
+        - small
+        - medium
+        - large
+        type: string
+      lang_code:
+        enum:
+        - ru
+        - kz
+        - en
+        type: string
+      last_seen_visibility:
+        enum:
+        - EVERYONE
+        - CONTACTS
+        - NOBODY
+        type: string
+      nft_showcase_enabled:
+        description: NEW
+        type: boolean
+      notification_channels:
+        type: boolean
+      notification_groups:
+        type: boolean
+      notification_messages:
+        type: boolean
+      notification_sound:
+        type: boolean
+      notification_vibration:
+        type: boolean
+      preview_in_notifications:
+        description: NEW
+        type: boolean
+      send_by_enter:
+        type: boolean
+      theme:
+        description: |-
+          Theme is a free-form string. Backend only stores the value and propagates it to other
+          sessions via PREFERENCES_UPDATED; client decides how to render. Lifted from `oneof` to
+          allow custom themes ("suda", "teaChatsDark", ...) without backend changes.
+        maxLength: 64
+        type: string
+      wallpaper_id:
+        description: NEW
+        type: string
+      who_can_add_to_groups:
+        description: NEW
+        enum:
+        - EVERYONE
+        - CONTACTS
+        - NOBODY
+        type: string
+      who_can_message:
+        enum:
+        - EVERYONE
+        - CONTACTS
+        - NOBODY
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.UserPreferences:
+    properties:
+      accept_gifts_from:
+        description: NEW
+        type: string
+      auto_download_media:
+        type: boolean
+      avatar_visibility:
+        type: string
+      chat_font_size:
+        description: Chat UI
+        type: string
+      lang_code:
+        type: string
+      last_seen_visibility:
+        description: Privacy
+        type: string
+      nft_showcase_enabled:
+        description: Blockchain features
+        type: boolean
+      notification_channels:
+        type: boolean
+      notification_groups:
+        type: boolean
+      notification_messages:
+        description: Notifications
+        type: boolean
+      notification_sound:
+        type: boolean
+      notification_vibration:
+        type: boolean
+      preview_in_notifications:
+        description: NEW
+        type: boolean
+      send_by_enter:
+        type: boolean
+      theme:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      wallpaper_id:
+        description: NEW
+        type: string
+      who_can_add_to_groups:
+        description: NEW
+        type: string
+      who_can_message:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.ChatSearchResponse:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.SearchResult'
+        type: array
+      total:
+        type: integer
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.GlobalSearchResponse:
+    properties:
+      chats:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.SearchResult'
+        type: array
+      messages:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.SearchResult'
+        type: array
+      users:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.SearchResult'
+        type: array
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.SearchResult:
+    properties:
+      chat_id:
+        type: string
+      created_at:
+        type: string
+      highlight:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      message_id:
+        type: integer
+      rank:
+        type: number
+      subtitle:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.ChangePasswordReq:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.LogoutReq:
+    properties:
+      fcm_token:
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.RegisterDeviceReq:
+    properties:
+      device_name:
+        type: string
+      fcm_token:
+        type: string
+    required:
+    - fcm_token
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.SessionInfo:
+    properties:
+      client_ip:
+        type: string
+      created_at:
+        type: string
+      device_name:
+        type: string
+      id:
+        type: string
+      last_used_at:
+        type: string
+      user_agent:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.TerminateOtherSessionsReq:
+    properties:
+      current_refresh_token:
+        type: string
+    required:
+    - current_refresh_token
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UpdateAvatarReq:
+    properties:
+      media_id:
+        type: string
+    required:
+    - media_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UpdateProfileReq:
+    properties:
+      bio:
+        maxLength: 500
+        type: string
+      display_name:
+        maxLength: 50
+        type: string
+      first_name:
+        maxLength: 60
+        type: string
+      last_name:
+        maxLength: 60
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UserResponse:
+    properties:
+      avatar_media_id:
+        type: string
+      bio:
+        type: string
+      display_name:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      last_name:
+        type: string
+      username:
+        type: string
+      wallet_address:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UserStatusResponse:
+    properties:
+      is_online:
+        type: boolean
+      last_seen_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.CreatePinReq:
+    properties:
+      pin_type:
+        enum:
+        - SIDEBAR
+        - CHATLIST
+        - APP_HUB
+        type: string
+      target_id:
+        type: string
+      target_type:
+        enum:
+        - CHAT
+        - APP
+        type: string
+    required:
+    - pin_type
+    - target_id
+    - target_type
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.ReorderItem:
+    properties:
+      pin_id:
+        type: integer
+      sort_order:
+        type: integer
+    required:
+    - pin_id
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.ReorderPinsReq:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.ReorderItem'
+        minItems: 1
+        type: array
+    required:
+    - items
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.UserPin:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      pin_type:
+        type: string
+      sort_order:
+        type: integer
+      target_id:
+        type: string
+      target_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond:
+    properties:
+      action:
+        type: string
+      message:
+        type: string
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    format: int64
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+host: localhost:8081
+info:
+  contact: {}
+  description: 'REST API for Suda Messenger: authentication, chats, messaging, users,
+    search.'
+  title: Suda Messenger Service API
+  version: "1.0"
+paths:
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email address
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.ForgotPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Request password reset code
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Log in with email and password
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.RefreshSessionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Refresh access and refresh tokens
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Reset password data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.ResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Reset password with verification code
+      tags:
+      - Auth
+  /auth/verify:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Verification code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.VerifyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Verify email with code
+      tags:
+      - Auth
+  /auth/webapp-session:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Called by WebView mini-apps (Wallet / Marketplace) on load.
+        The SPA reads `?initData=...` from its URL and posts it here;
+        backend validates HMAC + auth_date and returns an access JWT
+        (no refresh token — when it expires the SPA re-runs this
+        endpoint with the same initData, or the host app reopens the
+        WebView with a fresh one).
+      parameters:
+      - description: Init data string from URL
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.WebappSessionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_auth.WebappSessionResponse'
+        "400":
+          description: INVALID_INIT_DATA | INIT_DATA_EXPIRED | VALIDATION_ERROR
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      summary: Exchange Mini App init_data for a short-lived access JWT
+      tags:
+      - Auth
+  /channels/{id}/apps:
+    get:
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.ChannelAppLink'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get apps linked to a channel
+      tags:
+      - Channels
+    post:
+      consumes:
+      - application/json
+      description: Channel OWNER/ADMIN only.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: App ID to link
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.LinkAppReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Link an app to a channel
+      tags:
+      - Channels
+  /channels/{id}/apps/{app_id}:
+    delete:
+      description: Channel OWNER/ADMIN only.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: App UUID
+        in: path
+        name: app_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unlink an app from a channel
+      tags:
+      - Channels
+  /channels/{id}/posts/{msg_id}/comments:
+    get:
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Post (message) ID
+        in: path
+        name: msg_id
+        required: true
+        type: integer
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.CommentsListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get comments for a channel post
+      tags:
+      - Channels
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Post (message) ID
+        in: path
+        name: msg_id
+        required: true
+        type: integer
+      - description: Comment content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.AddCommentReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.ChannelComment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a comment to a channel post
+      tags:
+      - Channels
+  /channels/{id}/settings:
+    put:
+      consumes:
+      - application/json
+      description: Channel OWNER/ADMIN only.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Settings to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.UpdateChannelSettingsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update channel settings
+      tags:
+      - Channels
+  /channels/{id}/subscribe:
+    post:
+      description: Adds the authenticated user as a subscriber. Token-gating is enforced
+        — returns 402/403 if the user fails the rule.
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "402":
+          description: INSUFFICIENT_BALANCE
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: NO_WALLET | NFT_REQUIRED | GATING_REQUIREMENT_NOT_MET | FORBIDDEN
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Subscribe to a channel
+      tags:
+      - Channels
+  /channels/{id}/subscribers:
+    get:
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.SubscriberInfo'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get channel subscribers
+      tags:
+      - Channels
+  /channels/{id}/unsubscribe:
+    post:
+      parameters:
+      - description: Channel UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unsubscribe from a channel
+      tags:
+      - Channels
+  /channels/by-username/{username}:
+    get:
+      description: Returns channel_id by channel @username. The "@" prefix is trimmed
+        automatically.
+      parameters:
+      - description: Channel username (with or without @)
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: channel_id
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Resolve channel by username
+      tags:
+      - Channels
+  /channels/comments/{comment_id}:
+    delete:
+      description: Comment author or channel OWNER/ADMIN can delete.
+      parameters:
+      - description: Comment ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a comment
+      tags:
+      - Channels
+    put:
+      consumes:
+      - application/json
+      description: Only the comment author can edit their comment.
+      parameters:
+      - description: Comment ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      - description: New content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_channel.EditCommentReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Edit a comment
+      tags:
+      - Channels
+  /chats:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatListItemResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all chats for current user
+      tags:
+      - Chats
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.CreateChatReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Chat'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new chat
+      tags:
+      - Chats
+  /chats/{id}:
+    delete:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a chat
+      tags:
+      - Chats
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.UpdateChatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update chat name, description or avatar
+      tags:
+      - Chats
+  /chats/{id}/info:
+    get:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get detailed chat info with members
+      tags:
+      - Chats
+  /chats/{id}/leave:
+    post:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Leave a group chat
+      tags:
+      - Members
+  /chats/{id}/media:
+    get:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ChatMediaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get media files shared in chat
+      tags:
+      - Chats
+  /chats/{id}/members:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User to add
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.AddMemberReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a member to a group chat
+      tags:
+      - Members
+  /chats/{id}/members/{uid}:
+    delete:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID to remove (UUID)
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove a member from a group chat
+      tags:
+      - Members
+  /chats/{id}/members/{uid}/role:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Target user ID (UUID)
+        in: path
+        name: uid
+        required: true
+        type: string
+      - description: New role
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.UpdateMemberRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a member's role in chat
+      tags:
+      - Members
+  /chats/{id}/messages:
+    get:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Limit (default 50, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Message'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get messages from a chat
+      tags:
+      - Messages
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.SendMessageReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a message to a chat
+      tags:
+      - Messages
+  /chats/{id}/mute:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Mute settings
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MuteChatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mute chat notifications
+      tags:
+      - Members
+  /chats/{id}/pin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message to pin
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.PinMessageReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Pin a message in chat
+      tags:
+      - Members
+  /chats/{id}/pin/{mid}:
+    delete:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message ID
+        in: path
+        name: mid
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unpin a message in chat
+      tags:
+      - Members
+  /chats/{id}/search:
+    get:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Search query (min 2 chars)
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.ChatSearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search messages within a specific chat
+      tags:
+      - Search
+  /chats/{id}/unmute:
+    post:
+      parameters:
+      - description: Chat ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unmute chat notifications
+      tags:
+      - Members
+  /chats/forward:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Forward data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.ForwardMessageReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Forward a message to another chat
+      tags:
+      - Messages
+  /messages/{id}:
+    delete:
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Delete for all members
+        in: query
+        name: for_everyone
+        type: boolean
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a message
+      tags:
+      - Messages
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.EditMessageReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Edit a message
+      tags:
+      - Messages
+  /messages/{id}/readers:
+    get:
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.MessageReaderInfoResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get users who read a message
+      tags:
+      - Messages
+  /search:
+    get:
+      parameters:
+      - description: Search query (min 2 chars)
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_search.GlobalSearchResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search users, chats and messages globally
+      tags:
+      - Search
+  /user/avatar:
+    put:
+      consumes:
+      - application/json
+      description: Client uploads avatar via media-service first, then passes media_id
+        here
+      parameters:
+      - description: Avatar media ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UpdateAvatarReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user avatar by media ID
+      tags:
+      - User
+  /user/device:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Device data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.RegisterDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register a device for push notifications
+      tags:
+      - User
+  /user/id/{id}:
+    get:
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile by ID
+      tags:
+      - User
+  /user/id/{id}/status:
+    get:
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UserStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user online status
+      tags:
+      - User
+  /user/init-data:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: initData string
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Generate init data for mini-app integration
+      tags:
+      - User
+  /user/last-seen-hidden:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User UUIDs
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of users from whom my last-seen is hidden
+      tags:
+      - Preferences
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID to hide last-seen from
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.HideLastSeenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Hide my last-seen from a specific user
+      tags:
+      - Preferences
+  /user/last-seen-hidden/{id}:
+    delete:
+      parameters:
+      - description: Hidden user UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unhide my last-seen for a specific user
+      tags:
+      - Preferences
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Logout data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.LogoutReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Log out and revoke session
+      tags:
+      - User
+  /user/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - User
+  /user/password:
+    put:
+      consumes:
+      - application/json
+      description: Verifies old password, sets new one, revokes all refresh sessions
+        (user re-logs in everywhere).
+      parameters:
+      - description: Old and new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.ChangePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: INVALID_OLD_PASSWORD | VALIDATION_ERROR
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Change password (authenticated)
+      tags:
+      - User
+  /user/pins:
+    get:
+      parameters:
+      - description: Pin type (e.g. CHATLIST)
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.UserPin'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user pins
+      tags:
+      - UserPins
+    post:
+      consumes:
+      - application/json
+      description: Pins an entity (chat, channel) to the user's pin list (chatlist
+        or other).
+      parameters:
+      - description: Pin parameters (type, target_id)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.CreatePinReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.UserPin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a user pin
+      tags:
+      - UserPins
+  /user/pins/{id}:
+    delete:
+      parameters:
+      - description: Pin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a user pin
+      tags:
+      - UserPins
+  /user/pins/reorder:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: New pin order
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_userpins.ReorderPinsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Reorder user pins
+      tags:
+      - UserPins
+  /user/preferences:
+    get:
+      description: Returns the authenticated user's preferences (notifications, privacy,
+        language, etc.).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.UserPreferences'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user preferences
+      tags:
+      - Preferences
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.UpdatePreferencesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_preferences.UserPreferences'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user preferences
+      tags:
+      - Preferences
+  /user/profile:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Profile data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.UpdateProfileReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - User
+  /user/sessions:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.SessionInfo'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List active refresh sessions
+      tags:
+      - User
+  /user/sessions/{id}:
+    delete:
+      parameters:
+      - description: Session UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Revoke a specific refresh session
+      tags:
+      - User
+  /user/sessions/terminate-others:
+    post:
+      consumes:
+      - application/json
+      description: Client supplies its own refresh token in body so the backend knows
+        which session to keep alive.
+      parameters:
+      - description: Current refresh token to preserve
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_user.TerminateOtherSessionsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Revoke all other refresh sessions (keep current)
+      tags:
+      - User
+  /users/block:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User to block
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.BlockUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Block a user
+      tags:
+      - Users
+  /users/blocked:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Array of UUIDs
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of blocked user IDs
+      tags:
+      - Users
+  /users/contacts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.Contact'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all contacts with custom names
+      tags:
+      - Contacts
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Contact data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.SetContactNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Set a custom name for a contact
+      tags:
+      - Contacts
+  /users/contacts/{id}:
+    delete:
+      parameters:
+      - description: Contact user ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove a custom contact name
+      tags:
+      - Contacts
+  /users/friends:
+    get:
+      parameters:
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendInfo'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: List my friends
+      tags:
+      - Friends
+  /users/friends/{user_id}:
+    delete:
+      parameters:
+      - description: Friend user UUID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Remove friend
+      tags:
+      - Friends
+  /users/friends/{user_id}/status:
+    get:
+      description: Returns NONE / PENDING_SENT / PENDING_RECEIVED / FRIENDS / BLOCKED.
+      parameters:
+      - description: Other user UUID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.RelationStatusResponse'
+      security:
+      - BearerAuth: []
+      summary: Get relation status with a user
+      tags:
+      - Friends
+  /users/friends/requests:
+    get:
+      parameters:
+      - description: 'incoming | outgoing (default: both)'
+        in: query
+        name: type
+        type: string
+      - default: 50
+        description: Page size (1..100)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendRequestInfo'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: List pending friend requests
+      tags:
+      - Friends
+    post:
+      consumes:
+      - application/json
+      description: Sends a PENDING request to target user. Errors if already friends
+        / pending / self / blocked.
+      parameters:
+      - description: Target user id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.SendRequestReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_friends.FriendRequest'
+        "400":
+          description: VALIDATION_ERROR | SELF_REQUEST
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "403":
+          description: BLOCKED
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "409":
+          description: ALREADY_FRIENDS | ALREADY_PENDING
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send friend request
+      tags:
+      - Friends
+  /users/friends/requests/{id}:
+    delete:
+      description: Requester withdraws their own PENDING request.
+      parameters:
+      - description: Request UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+      security:
+      - BearerAuth: []
+      summary: Cancel sent friend request
+      tags:
+      - Friends
+  /users/friends/requests/{id}/accept:
+    post:
+      description: Target user accepts. After this both users are FRIENDS.
+      parameters:
+      - description: Request UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "403":
+          description: FORBIDDEN
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+        "409":
+          description: INVALID_TRANSITION
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Accept friend request
+      tags:
+      - Friends
+  /users/friends/requests/{id}/reject:
+    post:
+      parameters:
+      - description: Request UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+      security:
+      - BearerAuth: []
+      summary: Reject friend request
+      tags:
+      - Friends
+  /users/unblock:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User to unblock
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_features_chat.BlockUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.MessageRespond'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_moera-sudo_backend_backend_messenger-service_internal_pkg_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unblock a user
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

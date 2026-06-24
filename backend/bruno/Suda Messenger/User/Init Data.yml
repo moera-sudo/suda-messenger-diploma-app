@@ -1,0 +1,31 @@
+info:
+  name: Init Data
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/user/init-data"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+        test("Has user", function() {
+          expect(res.getBody().user).to.be.an("object");
+        });
+        test("Has chats", function() {
+          expect(res.getBody().chats).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

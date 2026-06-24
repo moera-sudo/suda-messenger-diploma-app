@@ -1,0 +1,31 @@
+info:
+  name: Get User By ID
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/user/id/{{test_user_id_2}}"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Returns correct user", function() {
+          expect(res.getBody().id).to.equal(bru.getEnvVar("test_user_id_2"));
+        });
+
+        test("Has username", function() {
+          expect(res.getBody().username).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

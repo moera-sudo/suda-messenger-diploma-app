@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package media;
+
+option go_package = "github.com/moera-sudo/backend/backend/proto/media;media";
+
+import "google/protobuf/timestamp.proto";
+
+// ===================================================
+// Media Service gRPC API
+// Используется другими микросервисами для работы с медиа.
+//
+// Примеры использования:
+//   - messenger-service вызывает LinkMediaToEntity при отправке сообщения с вложением
+//   - messenger-service вызывает BatchGetMediaURLs при загрузке списка сообщений
+//   - api-gateway может вызвать GetMedia для проверки статуса
+// ===================================================
+service MediaService {
+  // Получить метаданные медиа по ID
+  rpc GetMedia(GetMediaRequest) returns (GetMediaResponse);
+
+  // Привязать медиа к сущности (вызывается messenger-service при отправке сообщения)
+  rpc LinkMediaToEntity(LinkMediaToEntityRequest) returns (LinkMediaToEntityResponse);
+
+  // Пакетное получение URL для нескольких медиа (для списка сообщений в чате)
+  rpc BatchGetMediaURLs(BatchGetMediaURLsRequest) returns (BatchGetMediaURLsResponse);
+}
+
+// --- Get Media ---
+
+message GetMediaRequest {
+  string media_id = 1;
+}
+
+message GetMediaResponse {
+  MediaInfo media = 1;
+}
+
+message MediaInfo {
+  string id = 1;
+  string owner_user_id = 2;
+  string kind = 3;               // AVATAR, ATTACHMENT, VOICE_MESSAGE ...
+  string content_type = 4;       // image/jpeg, audio/ogg ...
+  int64  size_bytes = 5;
+  string status = 6;             // PENDING, READY, DELETED
+  bool   is_private = 7;
+  string original_name = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+// --- Link Media to Entity ---
+
+message LinkMediaToEntityRequest {
+  string media_id = 1;
+  string entity_type = 2;        // MESSAGE, CHAT_AVATAR, USER_AVATAR
+  string entity_id = 3;          // message_id, chat_id, user_id
+}
+
+message LinkMediaToEntityResponse {
+  bool success = 1;
+}
+
+// --- Batch Get URLs ---
+
+message BatchGetMediaURLsRequest {
+  repeated string media_ids = 1;
+  string requester_user_id = 2;
+}
+
+message BatchGetMediaURLsResponse {
+  map<string, string> urls = 1;  // media_id -> presigned URL
+}

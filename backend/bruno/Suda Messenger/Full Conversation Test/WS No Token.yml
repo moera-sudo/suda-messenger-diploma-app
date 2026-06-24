@@ -1,0 +1,19 @@
+info:
+  name: WS No Token
+  type: websocket
+  seq: 6
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Connection rejected without token", function() {
+          expect([401, 403]).to.include(res.getStatus());
+        });
+
+settings:
+  timeout: 3000

@@ -1,0 +1,9 @@
+info:
+  name: Search
+  type: folder
+  seq: 7
+
+request:
+  auth:
+    type: bearer
+    token: "{{access_token}}"

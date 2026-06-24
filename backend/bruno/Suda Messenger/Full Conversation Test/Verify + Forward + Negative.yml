@@ -1,0 +1,162 @@
+info:
+  name: Verify + Forward + Negative
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/messages?limit=50&offset=0"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const axios = require('axios');
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const authHeaders = { "Authorization": "Bearer " + token };
+        const jsonHeaders = { "Content-Type": "application/json", ...authHeaders };
+        const directId = bru.getEnvVar("test_direct_chat_id");
+        const groupId = bru.getEnvVar("test_group_chat_id");
+        const msgId = bru.getEnvVar("test_message_id");
+
+        // ── FORWARD: direct → group ──
+        if (groupId && msgId) {
+          try {
+            const fwdRes = await axios.post(
+              baseUrl + prefix + "/chats/forward",
+              { from_chat_id: directId, to_chat_id: groupId, message_id: parseInt(msgId) },
+              { headers: jsonHeaders }
+            );
+            console.log("✅ Forward: content=" + fwdRes.data.content + " forwarded_from_chat=" + fwdRes.data.forwarded_from_chat);
+          } catch (e) {
+            console.log("❌ Forward failed: " + JSON.stringify(e.response?.data));
+          }
+        }
+
+        // ── Проверяем GROUP messages после forward ──
+        if (groupId) {
+          const grpRes = await axios.get(
+            baseUrl + prefix + "/chats/" + groupId + "/messages?limit=50&offset=0",
+            { headers: authHeaders }
+          );
+          const grpMsgs = grpRes.data;
+          const hasForwarded = grpMsgs.find(m => m.forwarded_from_chat != null);
+          const hasText = grpMsgs.find(m => m.content === "Hello group!");
+          const hasImage = grpMsgs.find(m => m.type === "IMAGE");
+          console.log("✅ Group messages: total=" + grpMsgs.length +
+            " forwarded=" + !!hasForwarded +
+            " text=" + !!hasText +
+            " image=" + !!hasImage);
+        }
+
+        // ── NEGATIVE: отправка в чужой чат ──
+        try {
+          await axios.post(
+            baseUrl + prefix + "/chats/00000000-0000-0000-0000-000000000000/messages",
+            { content: "Should fail", type: "TEXT" },
+            { headers: jsonHeaders }
+          );
+          console.log("❌ Negative send: expected 500, got 2xx");
+        } catch (e) {
+          const status = e.response?.status;
+          console.log(status === 500
+            ? "✅ Negative send: blocked (500)"
+            : "❌ Negative send: expected 500, got " + status);
+        }
+
+        // ── NEGATIVE: чтение чужого чата ──
+        try {
+          await axios.get(
+            baseUrl + prefix + "/chats/00000000-0000-0000-0000-000000000000/messages?limit=50&offset=0",
+            { headers: authHeaders }
+          );
+          console.log("❌ Negative read: expected 500, got 2xx");
+        } catch (e) {
+          const status = e.response?.status;
+          console.log(status === 500
+            ? "✅ Negative read: blocked (500)"
+            : "❌ Negative read: expected 500, got " + status);
+        }
+
+        // ── GET USER CHATS ──
+        const chatsRes = await axios.get(baseUrl + prefix + "/chats", { headers: authHeaders });
+        const chats = chatsRes.data;
+        if (Array.isArray(chats) && chats.length >= 3) {
+          const types = chats.map(c => c.type);
+          console.log("✅ User chats (" + chats.length + "): SAVED=" + types.includes("SAVED") +
+            " DIRECT=" + types.includes("DIRECT") +
+            " GROUP=" + types.includes("GROUP"));
+        } else {
+          console.log("❌ Expected >= 3 chats, got " + (chats ? chats.length : 0));
+        }
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Returns array", function() {
+          expect(res.getBody()).to.be.an("array");
+        });
+
+        test("Has at least 3 messages", function() {
+          expect(res.getBody().length).to.be.greaterThanOrEqual(3);
+        });
+
+        test("Messages ordered DESC", function() {
+          const msgs = res.getBody();
+          if (msgs.length >= 2) {
+            expect(msgs[0].id).to.be.greaterThan(msgs[1].id);
+          }
+        });
+
+        test("Each message has required fields", function() {
+          const msg = res.getBody()[0];
+          expect(msg).to.have.property("id");
+          expect(msg).to.have.property("chat_id");
+          expect(msg).to.have.property("sender_id");
+          expect(msg).to.have.property("content");
+          expect(msg).to.have.property("type");
+          expect(msg).to.have.property("status");
+          expect(msg).to.have.property("created_at");
+        });
+
+        test("Contains TEXT message", function() {
+          const found = res.getBody().find(m => m.content === "Hello from Bruno!");
+          expect(found).to.not.be.undefined;
+          expect(found.type).to.equal("TEXT");
+        });
+
+        test("Contains REPLY message", function() {
+          const found = res.getBody().find(m => m.reply_to_message_id != null);
+          expect(found).to.not.be.undefined;
+          expect(found.content).to.equal("This is a reply!");
+        });
+
+        test("Contains IMAGE with empty content", function() {
+          if (bru.getEnvVar("test_media_id")) {
+            const found = res.getBody().find(m => m.type === "IMAGE" && m.content === "");
+            expect(found).to.not.be.undefined;
+            expect(found.attachment_media_id).to.be.a("string");
+          }
+        });
+
+        test("Contains FILE message", function() {
+          if (bru.getEnvVar("test_media_id")) {
+            const found = res.getBody().find(m => m.type === "FILE");
+            expect(found).to.not.be.undefined;
+            expect(found.content).to.equal("Check this doc");
+            expect(found.attachment_media_id).to.be.a("string");
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,26 @@
+info:
+  name: Expired Token 401
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  headers:
+    - name: Authorization
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDAwMDAwMDAsInN1YiI6ImZha2UiLCJ0eXBlIjoiYWNjZXNzIn0.invalid
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 401 with expired token", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

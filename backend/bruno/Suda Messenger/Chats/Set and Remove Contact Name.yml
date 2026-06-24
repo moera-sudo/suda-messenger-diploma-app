@@ -1,0 +1,60 @@
+info:
+  name: Set and Remove Contact Name
+  type: http
+  seq: 22
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/users/contacts"
+  body:
+    type: json
+    data: |-
+      {
+        "user_id": "{{test_user_id_2}}",
+        "custom_name": "Best Friend"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is CONTACT_SET", function() {
+          expect(res.getBody().action).to.equal("CONTACT_SET");
+        });
+    - type: after-response
+      code: |-
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const userId2 = bru.getEnvVar("test_user_id_2");
+
+        const listRes = await fetch(baseUrl + prefix + "/users/contacts", {
+          method: "GET",
+          headers: { "Authorization": "Bearer " + token }
+        });
+        const contacts = await listRes.json();
+        console.log("✅ Contacts count: " + (Array.isArray(contacts) ? contacts.length : 0));
+
+        const removeRes = await fetch(baseUrl + prefix + "/users/contacts/" + userId2, {
+          method: "DELETE",
+          headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (removeRes.status === 200) {
+          console.log("✅ Contact removed");
+        } else {
+          console.log("❌ Remove failed: " + removeRes.status);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

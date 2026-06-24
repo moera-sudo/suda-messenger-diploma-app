@@ -1,0 +1,25 @@
+info:
+  name: Delete Media
+  type: http
+  seq: 1
+
+http:
+  method: DELETE
+  url: "{{base_url}}{{media_prefix}}/{{test_media_id}}"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 204", function() {
+          expect(res.getStatus()).to.equal(204);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,40 @@
+# This file is automatically read by `docker compose up` (dev mode).
+# To skip it (prod): `docker compose -f docker-compose.yml up`.
+#
+# Purpose: expose all internal ports on host for dev convenience.
+# In prod nothing leaks except 80 (nginx) and 9000 (portainer).
+
+services:
+  postgres:
+    ports: ["55432:5432"]
+  redis:
+    ports: ["6379:6379"]
+  minio:
+    ports:
+      - "9001:9000"   # S3 API (mapped to 9001 to avoid clash with portainer)
+      - "9091:9001"   # MinIO console
+  besu-node:
+    ports:
+      - "8545:8545"
+      - "30303:30303"
+
+  api-gateway:
+    ports: ["8080:8080"]
+  messenger-service:
+    ports:
+      - "8081:8081"
+      - "9081:9081"
+  transaction-service:
+    ports:
+      - "8082:8082"
+      - "9082:9082"
+  media-service:
+    ports:
+      - "8084:8084"
+      - "9094:9094"
+
+  # nginx и portainer не нужны в dev — обращаемся напрямую к сервисам
+  nginx:
+    profiles: ["prod-only"]
+  portainer:
+    profiles: ["prod-only"]

@@ -1,0 +1,35 @@
+info:
+  name: Edit Message
+  type: http
+  seq: 16
+
+http:
+  method: PUT
+  url: "{{base_url}}{{messenger_prefix}}/messages/{{test_message_id}}"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Edited message!"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is MESSAGE_EDITED", function() {
+          expect(res.getBody().action).to.equal("MESSAGE_EDITED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

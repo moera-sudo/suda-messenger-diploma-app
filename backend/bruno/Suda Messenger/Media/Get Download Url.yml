@@ -1,0 +1,37 @@
+info:
+  name: Get Download URL
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}{{media_prefix}}/{{test_media_id}}/download-url"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Has presigned URL", function() {
+          expect(res.getBody().url).to.include("X-Amz-Signature");
+        });
+
+        test("URL contains attachment disposition", function() {
+          expect(res.getBody().url).to.include("attachment");
+        });
+
+        test("Expires in 1 hour", function() {
+          expect(res.getBody().expires_in).to.equal(3600);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

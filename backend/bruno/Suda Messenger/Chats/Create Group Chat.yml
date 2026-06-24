@@ -1,0 +1,46 @@
+info:
+  name: Create Group Chat
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "GROUP",
+        "name": "Bruno Test Group",
+        "member_ids": ["{{test_user_id_2}}"]
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_group_chat_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Chat type is GROUP", function() {
+          expect(res.getBody().type).to.equal("GROUP");
+        });
+
+        test("Name is set", function() {
+          expect(res.getBody().name).to.equal("Bruno Test Group");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

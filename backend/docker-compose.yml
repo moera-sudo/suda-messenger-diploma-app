@@ -1,0 +1,282 @@
+secrets:
+  wallet_encryption_key:
+    file: ./secrets/wallet_encryption_key.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
+  gateway_signature_secret:
+    file: ./secrets/gateway_signature_secret.txt
+  init_data_sign_token:
+    file: ./secrets/init_data_sign_token.txt
+  eth_private_key:
+    file: ./secrets/eth_private_key.txt
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-suda}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-suda}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [app-network]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks: [app-network]
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-13T22-19-12Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+    restart: unless-stopped
+
+  besu-node:
+    image: hyperledger/besu:25.12.0
+    # ports: 
+    #   - "8545:8545"
+    volumes:
+      - ./besu/network:/opt/besu/data:ro
+      - besu_data:/var/lib/besu
+    command:
+      - --data-path=/var/lib/besu
+      - --genesis-file=/opt/besu/data/genesis.json
+      - --node-private-key-file=/opt/besu/data/keys/node1/key
+      - --min-gas-price=0
+      - --rpc-http-enabled
+      - --rpc-http-host=0.0.0.0
+      - --rpc-http-cors-origins=*
+      - --rpc-http-api=ETH,NET,QBFT,WEB3
+      - --host-allowlist=*
+    networks: [app-network]
+    restart: unless-stopped
+
+  # ── One-shot init container ──
+  migrate:
+    image: migrate/migrate:v4.17.0
+    restart: "no"
+    volumes:
+      - ./migrations:/migrations:ro
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-suda}?sslmode=disable"
+      - "up"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [app-network]
+
+  contracts-deploy:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    environment:
+      BESU_RPC_URL: http://besu-node:8545
+      BESU_CHAIN_ID: ${BESU_CHAIN_ID:-1337}
+      ETH_PRIVATE_KEY: ${ETH_PRIVATE_KEY}
+    volumes:
+      - ./secrets:/secrets
+    depends_on:
+      besu-node:
+        condition: service_started
+    restart: "no"
+    networks: [app-network]
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      # Read-only mounts конфигов
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - api-gateway
+    networks: [app-network]
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce:2.21.4-alpine
+    ports:
+      - "9443:9000"          # HTTP UI on host :9443 (внутри VPN HTTPS не нужен)
+    command: ["--http-enabled"]
+    volumes:
+      # CRITICAL: Portainer общается с Docker через unix-сокет хоста.
+      # Это даёт ему root-доступ к Docker — кладите порт под VPN.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks: [app-network]
+    restart: unless-stopped
+
+  # ── Go services ──
+  api-gateway:
+    build:
+      context: .
+      dockerfile: backend/api-gateway/Dockerfile
+    secrets:
+      - gateway_signature_secret
+      - jwt_secret
+    environment:
+      GATEWAY_PORT: ":8080"
+      GATEWAY_SIGNATURE_SECRET_FILE: /run/secrets/gateway_signature_secret
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      MESSENGER_HOST: http://messenger-service:8081
+      MEDIA_HOST: http://media-service:8084
+      TRANSACTION_HOST: http://transaction-service:8082
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      messenger-service:
+        condition: service_started
+    networks: [app-network]
+    restart: unless-stopped
+
+  messenger-service:
+    build:
+      context: .
+      dockerfile: backend/messenger-service/Dockerfile
+    secrets:
+      - jwt_secret
+      - gateway_signature_secret
+      - init_data_sign_token
+    environment:
+      MESSENGER_PORT: ":8081"
+      MESSENGER_GRPC_PORT: ":9081"
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-suda}?sslmode=disable
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-30m}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-720h}
+      GATEWAY_SIGNATURE_SECRET_FILE: /run/secrets/gateway_signature_secret
+      APP_SECRET: ${APP_SECRET}
+      INIT_DATA_SIGN_TOKEN_FILE: /run/secrets/init_data_sign_token
+      MEDIA_SERVICE_ADDR: media-service:9094
+      TRANSACTION_SERVICE_ADDR: transaction-service:9082
+      FIREBASE_CREDENTIALS: /run/secrets/firebase-adminsdk.json
+      MESSAGE_ENCRYPTION_KEY_FILE: /run/secrets/message_encryption_key.txt
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+    volumes:
+      - ./secrets/firebase-adminsdk.json:/run/secrets/firebase-adminsdk.json:ro
+      - ./secrets/message_encryption_key.txt:/run/secrets/message_encryption_key.txt:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks: [app-network]
+    restart: unless-stopped
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: backend/transaction-service/Dockerfile
+    secrets:
+      - gateway_signature_secret
+      - wallet_encryption_key
+      - eth_private_key
+    environment:
+      TRANSACTION_PORT: ":8082"
+      TRANSACTION_GRPC_PORT: ":9082"
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-suda}?sslmode=disable
+      REDIS_ADDR: redis:6379
+      GATEWAY_SIGNATURE_SECRET_FILE: /run/secrets/gateway_signature_secret
+      BESU_RPC_URL: http://besu-node:8545
+      BESU_CHAIN_ID: ${BESU_CHAIN_ID:-1337}
+      ETH_PRIVATE_KEY_FILE: /run/secrets/eth_private_key
+      WALLET_ENCRYPTION_KEY_FILE: /run/secrets/wallet_encryption_key
+      GLOBAL_TREASURY_ADDR: ${GLOBAL_TREASURY_ADDR}
+      # SUDA_TOKEN_ADDRESS: ${SUDA_TOKEN_ADDRESS}
+      # SUDA_NFT_ADDRESS: ${SUDA_NFT_ADDRESS}
+      # SUDA_MARKETPLACE_ADDRESS: ${SUDA_MARKETPLACE_ADDRESS}
+      # SUDA_ESCROW_ADDRESS: ${SUDA_ESCROW_ADDRESS}
+      # SUDA_FUNDRAISING_ADDRESS: ${SUDA_FUNDRAISING_ADDRESS}
+      MESSENGER_GRPC_ADDR: messenger-service:9081
+    env_file:
+      - path: ./secrets/contracts.env
+        required: false
+    depends_on:
+      contracts-deploy:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      besu-node:
+        condition: service_started
+    networks: [app-network]
+    restart: unless-stopped
+
+  media-service:
+    build:
+      context: .
+      dockerfile: backend/media-service/Dockerfile
+    secrets:
+      - gateway_signature_secret
+    environment:
+      MEDIA_PORT: ":8084"
+      MEDIA_GRPC_PORT: ":9094"
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-suda}?sslmode=disable
+      GATEWAY_SIGNATURE_SECRET_FILE: /run/secrets/gateway_signature_secret
+      MESSENGER_GRPC_ADDR: messenger-service:9081
+      S3_ENDPOINT: minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_USE_SSL: "false"
+      S3_DEFAULT_BUCKET: ${S3_DEFAULT_BUCKET:-media}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT}
+      PRESIGN_UPLOAD_EXPIRY: ${PRESIGN_UPLOAD_EXPIRY:-900}
+      PRESIGN_VIEW_EXPIRY: ${PRESIGN_VIEW_EXPIRY:-14400}
+      PRESIGN_DOWNLOAD_EXPIRY: ${PRESIGN_DOWNLOAD_EXPIRY:-3600}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    networks: [app-network]
+    restart: unless-stopped
+
+  wallet-frontend:
+    build:
+      context: ./web/wallet
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks: [app-network]
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  minio_data:
+  besu_data:
+  portainer_data:

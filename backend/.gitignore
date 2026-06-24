@@ -1,0 +1,92 @@
+# Environment
+.env
+.env.*
+*.secret
+backend/**/config.yaml
+firebase-adminsdk.json
+suda-deprecated
+.claude
+CLAUDE.md
+.CLAUDE.md
+CLAUDE
+./CLAUDE.md
+.agents
+.codex
+
+# Go
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Tests
+*.test
+
+# Java
+.gradle/
+build/
+!src/main/resources/
+!gradle/wrapper/gradle-wrapper.jar
+
+# For maven(if so)
+target/
+*.class
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker and infra data
+infra/postgres/data/
+infra/redis/data/
+# besu/data/ 
+# besu/database/
+# besu/config/qbft-config.json
+# besu/network
+
+# logs
+*.log
+logs/
+
+# HardHat
+# Node modules
+contracts/node_modules
+# Compilation output
+contracts/dist
+# pnpm deploy output
+contracts/bundle
+# Hardhat Build Artifacts
+contracts/artifacts
+# Hardhat compilation (v2) support directory
+contracts/cache
+# Typechain output
+contracts/types
+# Hardhat coverage reports
+contracts/coverage
+# Contracts environment
+contracts/deployments/
+secrets/contracts.env
+
+
+# Dependencies
+node_modules
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker Secrets
+secrets/*
+!secrets/.gitkeep
+!secrets/README.md
+
+# Local compose overrides
+docker-compose.override.local.yml
+

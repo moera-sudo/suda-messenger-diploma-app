@@ -1,0 +1,58 @@
+info:
+  name: Upload Init
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}{{media_prefix}}/upload/init"
+  body:
+    type: json
+    data: |-
+      {
+        "kind": "ATTACHMENT",
+        "content_type": "image/jpeg",
+        "original_name": "test_image.jpg",
+        "is_private": false,
+        "size_bytes": 10240
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_media_id", res.getBody().media_id);
+          bru.setEnvVar("test_upload_url", res.getBody().upload_url);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Has media_id", function() {
+          expect(res.getBody().media_id).to.be.a("string");
+          expect(res.getBody().media_id.length).to.be.greaterThan(10);
+        });
+
+        test("Has upload_url with signature", function() {
+          expect(res.getBody().upload_url).to.include("X-Amz-Signature");
+        });
+
+        test("Has object_key", function() {
+          expect(res.getBody().object_key).to.include("attachment/");
+        });
+
+        test("Expires in 900 seconds", function() {
+          expect(res.getBody().expires_in).to.equal(900);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

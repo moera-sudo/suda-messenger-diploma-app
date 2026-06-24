@@ -1,0 +1,36 @@
+info:
+  name: Register
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{test_username}}",
+        "name": "{{test_display_name}}",
+        "email": "{{test_email}}",
+        "password": "{{test_password}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Action is USER_CREATED", function() {
+          expect(res.getBody().action).to.equal("USER_CREATED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

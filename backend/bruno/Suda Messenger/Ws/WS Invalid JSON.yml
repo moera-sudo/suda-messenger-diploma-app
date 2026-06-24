@@ -1,0 +1,22 @@
+info:
+  name: WS Invalid JSON
+  type: websocket
+  seq: 7
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: text
+    data: "this is not valid json"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Connection stays open after invalid JSON", function() {
+          expect(res.getStatus()).to.equal(101);
+        });
+
+settings:
+  timeout: 3000

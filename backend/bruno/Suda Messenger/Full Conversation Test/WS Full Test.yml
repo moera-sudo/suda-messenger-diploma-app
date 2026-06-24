@@ -1,0 +1,57 @@
+info:
+  name: WS Full Test
+  type: websocket
+  seq: 4
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: json
+    data: |-
+      {
+        "type": "SEND_MESSAGE",
+        "payload": {
+          "chat_id": "{{test_direct_chat_id}}",
+          "content": "Hello via WebSocket!",
+          "type": "TEXT",
+          "client_side_id": "ws-001"
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const msg = JSON.parse(res.getMessage());
+        bru.setEnvVar("ws_test_message_id", msg.payload.id);
+    - type: tests
+      code: |-
+        const msg = JSON.parse(res.getMessage());
+
+        test("Receives NEW_MESSAGE", function() {
+          expect(msg.type).to.equal("NEW_MESSAGE");
+        });
+
+        test("Content matches", function() {
+          expect(msg.payload.content).to.equal("Hello via WebSocket!");
+        });
+
+        test("Message ID > 0", function() {
+          expect(msg.payload.id).to.be.greaterThan(0);
+        });
+
+        test("Status is SENT", function() {
+          expect(msg.payload.status).to.equal("SENT");
+        });
+
+        test("Chat ID matches", function() {
+          expect(msg.payload.chat_id).to.equal(bru.getEnvVar("test_direct_chat_id"));
+        });
+
+        test("Client side ID echoed", function() {
+          expect(msg.payload.client_side_id).to.equal("ws-001");
+        });
+
+settings:
+  timeout: 5000

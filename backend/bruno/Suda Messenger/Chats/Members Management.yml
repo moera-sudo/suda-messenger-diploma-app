@@ -1,0 +1,62 @@
+info:
+  name: Members Management
+  type: http
+  seq: 24
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_leave_group_id}}/leave"
+  body:
+    type: json
+    data: ""
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const userId2 = bru.getEnvVar("test_user_id_2");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+
+        const createRes = await fetch(baseUrl + prefix + "/chats", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({
+            type: "GROUP",
+            name: "Leave Test Group",
+            member_ids: [userId2]
+          })
+        });
+        const group = await createRes.json();
+        bru.setEnvVar("test_leave_group_id", group.id);
+        console.log("✅ Created test group: " + group.id);
+
+        const roleRes = await fetch(baseUrl + prefix + "/chats/" + group.id + "/members/" + userId2 + "/role", {
+          method: "PUT",
+          headers: headers,
+          body: JSON.stringify({ role: "ADMIN" })
+        });
+        console.log("✅ Update role: " + roleRes.status);
+    - type: tests
+      code: |-
+        test("Leave chat returns 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is LEFT_CHAT", function() {
+          expect(res.getBody().action).to.equal("LEFT_CHAT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

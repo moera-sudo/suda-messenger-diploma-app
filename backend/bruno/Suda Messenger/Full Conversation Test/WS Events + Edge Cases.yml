@@ -1,0 +1,117 @@
+info:
+  name: WS Events + Edge Cases
+  type: websocket
+  seq: 5
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: json
+    data: |-
+      {
+        "type": "TYPING",
+        "payload": {
+          "chat_id": "{{test_direct_chat_id}}"
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const ws = res.getWebSocket();
+        const directId = bru.getEnvVar("test_direct_chat_id");
+        const groupId = bru.getEnvVar("test_group_chat_id");
+        const msgId = bru.getEnvVar("ws_test_message_id") || bru.getEnvVar("test_message_id");
+        const mediaId = bru.getEnvVar("test_media_id");
+
+        // ── READ_MESSAGE ──
+        ws.send(JSON.stringify({
+          type: "READ_MESSAGE",
+          payload: {
+            chat_id: directId,
+            message_id: parseInt(msgId)
+          }
+        }));
+        console.log("✅ READ_MESSAGE sent: message_id=" + msgId);
+
+        // ── FORWARD via WS ──
+        if (groupId && msgId) {
+          ws.send(JSON.stringify({
+            type: "FORWARD_MESSAGE",
+            payload: {
+              from_chat_id: directId,
+              to_chat_id: groupId,
+              message_id: parseInt(msgId)
+            }
+          }));
+          console.log("✅ FORWARD_MESSAGE sent: " + directId + " → " + groupId);
+
+          ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === "NEW_MESSAGE" && data.payload.forwarded_from_chat) {
+              console.log("✅ Forward received via WS: content=" + data.payload.content);
+            }
+          };
+        }
+
+        // ── IMAGE через WS ──
+        if (mediaId) {
+          ws.send(JSON.stringify({
+            type: "SEND_MESSAGE",
+            payload: {
+              chat_id: directId,
+              content: "",
+              type: "IMAGE",
+              attachment_media_id: mediaId,
+              client_side_id: "ws-att-001"
+            }
+          }));
+          console.log("✅ WS IMAGE sent: media_id=" + mediaId);
+        }
+
+        // ── FILE через WS ──
+        if (mediaId) {
+          ws.send(JSON.stringify({
+            type: "SEND_MESSAGE",
+            payload: {
+              chat_id: directId,
+              content: "Doc via WS",
+              type: "FILE",
+              attachment_media_id: mediaId,
+              client_side_id: "ws-file-001"
+            }
+          }));
+          console.log("✅ WS FILE sent");
+        }
+
+        // ── Сообщение в GROUP через WS ──
+        if (groupId) {
+          ws.send(JSON.stringify({
+            type: "SEND_MESSAGE",
+            payload: {
+              chat_id: groupId,
+              content: "Group msg via WS",
+              type: "TEXT",
+              client_side_id: "ws-group-001"
+            }
+          }));
+          console.log("✅ WS group message sent");
+        }
+
+        // ── EDGE CASE: Invalid JSON ──
+        ws.send("this is not valid json");
+        console.log("✅ Invalid JSON sent (should not crash)");
+
+        // ── EDGE CASE: Unknown event ──
+        ws.send(JSON.stringify({ type: "BANANA", payload: {} }));
+        console.log("✅ Unknown event sent (should not crash)");
+    - type: tests
+      code: |-
+        test("Connection alive after TYPING", function() {
+          expect(res.getStatus()).to.equal(101);
+        });
+
+settings:
+  timeout: 5000

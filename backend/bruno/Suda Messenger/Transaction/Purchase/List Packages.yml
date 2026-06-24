@@ -1,0 +1,36 @@
+info:
+  name: List Packages
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}{{transaction_prefix}}/purchase/packages"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+        test("Has packages array", function() {
+          expect(res.getBody().packages).to.be.an("array");
+        });
+        test("Has at least 4 packages", function() {
+          expect(res.getBody().packages.length).to.be.at.least(4);
+        });
+        test("First package has code and fiat_price", function() {
+          var pkg = res.getBody().packages[0];
+          expect(pkg.code).to.be.a("string");
+          expect(pkg.fiat_price).to.be.a("number");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,39 @@
+info:
+  name: Search In Chat
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/search?q=Bruno"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Has messages array", function() {
+          expect(res.getBody().messages).to.be.an("array");
+        });
+
+        test("Has total count", function() {
+          expect(res.getBody().total).to.be.a("number");
+        });
+
+        test("Messages have highlights", function() {
+          if (res.getBody().messages.length > 0) {
+            const m = res.getBody().messages[0];
+            expect(m).to.have.property("highlight");
+            expect(m.highlight).to.include("<b>");
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

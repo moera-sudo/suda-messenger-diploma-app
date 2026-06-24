@@ -1,0 +1,38 @@
+info:
+  name: Get Chat Media
+  type: http
+  seq: 23
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/media"
+  body:
+    type: none
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Has media categories", function() {
+          expect(res.getBody()).to.have.property("images");
+          expect(res.getBody()).to.have.property("videos");
+          expect(res.getBody()).to.have.property("documents");
+          expect(res.getBody()).to.have.property("audio");
+        });
+
+        test("Images is array", function() {
+          expect(res.getBody().images).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

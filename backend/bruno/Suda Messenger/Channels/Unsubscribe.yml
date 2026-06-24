@@ -1,0 +1,25 @@
+info:
+  name: Unsubscribe
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/channels/{{test_channel_id}}/unsubscribe"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

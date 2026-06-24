@@ -1,0 +1,25 @@
+info:
+  name: Get By Username
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/channels/by-username/{{test_username}}"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 or 404", function() {
+          expect([200, 404]).to.include(res.getStatus());
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,34 @@
+info:
+  name: Invalid Login
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email":"{{test_email}}",
+        "password":"wrong_passwrod123"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 401", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
+
+        test("Error is UNAUTHORIZED", function() {
+          expect(res.getBody().error).to.equal("UNAUTHORIZED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,48 @@
+info:
+  name: Create Saved Chat
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "SAVED"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_saved_chat_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Chat type is SAVED", function() {
+          expect(res.getBody().type).to.equal("SAVED");
+        });
+
+        test("Name is Saved Messages", function() {
+          expect(res.getBody().name).to.equal("Saved Messages");
+        });
+
+        test("Has chat ID", function() {
+          expect(res.getBody().id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

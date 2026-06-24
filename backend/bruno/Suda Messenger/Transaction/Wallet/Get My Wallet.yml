@@ -1,0 +1,32 @@
+info:
+  name: Get My Wallet
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}{{transaction_prefix}}/wallet/me"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+        test("Has address", function() {
+          expect(res.getBody().address).to.be.a("string");
+          expect(res.getBody().address).to.match(/^0x/);
+        });
+        test("Has suda_balance_wei", function() {
+          expect(res.getBody().suda_balance_wei).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

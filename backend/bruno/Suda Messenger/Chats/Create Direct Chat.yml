@@ -1,0 +1,46 @@
+info:
+  name: Create Direct Chat
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "DIRECT",
+        "target_id": "62d2f8e2-0147-4bd0-a63b-1a5b0692c056"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzkyMDA1NjYsImlhdCI6MTc3OTE5ODc2Niwicm9sZSI6InVzZXIiLCJzdWIiOiI4NDIyMDNhOS02ZThkLTQ2NjQtYTY2NS0zODc0OTJiNmM1MDYiLCJ0eXBlIjoiYWNjZXNzIn0.9bxTEpWzJP5xYp1RgEpiAuD9gV2LFWssmJpBMLvOd2s
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_direct_chat_id", res.getBody().id);
+          bru.setEnvVar("test_chat_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Chat type is DIRECT", function() {
+          expect(res.getBody().type).to.equal("DIRECT");
+        });
+
+        test("Has chat ID", function() {
+          expect(res.getBody().id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

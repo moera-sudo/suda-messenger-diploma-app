@@ -1,0 +1,52 @@
+info:
+  name: Login Second User
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email":"{{test_email_2}}",
+        "password":"{{test_password_2}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 200) {
+          bru.setEnvVar("access_token", res.getBody().access_token);
+          bru.setEnvVar("refresh_token", res.getBody().refresh_token);
+
+          const token = res.getBody().access_token;
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          bru.setEnvVar("test_user_id", payload.sub || payload.user_id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Has access_token", function() {
+          expect(res.getBody().access_token).to.be.a("string");
+        });
+
+        test("Has refresh_token", function() {
+          expect(res.getBody().refresh_token).to.be.a("string");
+        });
+
+        test("Has expiry info", function() {
+          expect(res.getBody().access_expires_in).to.be.greaterThan(0);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,65 @@
+info:
+  name: Get Message Readers
+  type: http
+  seq: 25
+
+http:
+  method: GET
+  url: "{{base_url}}{{messenger_prefix}}/messages/{{test_readers_message_id}}/readers"
+  body:
+    type: none
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const baseUrl = bru.getEnvVar("base_url");
+        const prefix = bru.getEnvVar("messenger_prefix");
+        const token = bru.getEnvVar("access_token");
+        const groupId = bru.getEnvVar("test_group_chat_id");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        };
+
+        const sendRes = await fetch(baseUrl + prefix + "/chats/" + groupId + "/messages", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({
+            content: "Message for readers test",
+            type: "TEXT"
+          })
+        });
+        const msg = await sendRes.json();
+        bru.setEnvVar("test_readers_message_id", msg.id);
+    - type: tests
+      code: |-
+        const status = res.getStatus();
+
+        test("Status is 200", function() {
+          expect(status).to.equal(200);
+        });
+
+        test("Returns array", function() {
+          if (status === 200) {
+            expect(res.getBody()).to.be.an("array");
+          }
+        });
+
+        test("Readers have required fields", function() {
+          if (status === 200 && res.getBody().length > 0) {
+            const reader = res.getBody()[0];
+            expect(reader).to.have.property("user_id");
+            expect(reader).to.have.property("username");
+            expect(reader).to.have.property("display_name");
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

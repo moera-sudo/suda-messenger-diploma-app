@@ -1,0 +1,40 @@
+info:
+  name: Send To Saved Messages
+  type: http
+  seq: 15
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_saved_chat_id}}/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Note to self: Bruno tests passed!",
+        "type": "TEXT"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Chat ID is saved chat", function() {
+          expect(res.getBody().chat_id).to.equal(bru.getEnvVar("test_saved_chat_id"));
+        });
+
+        test("Sender is self", function() {
+          expect(res.getBody().sender_id).to.equal(bru.getEnvVar("test_user_id"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

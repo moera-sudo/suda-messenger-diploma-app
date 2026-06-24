@@ -1,0 +1,51 @@
+info:
+  name: WS Forward Message
+  type: websocket
+  seq: 5
+
+websocket:
+  url: "ws://localhost:8080/api/v1/messenger/ws?token={{access_token}}"
+  message:
+    type: json
+    data: |-
+      {
+        "type": "FORWARD_MESSAGE",
+        "payload": {
+          "from_chat_id": "{{test_direct_chat_id}}",
+          "to_chat_id": "{{test_group_chat_id}}",
+          "message_id": {{test_message_id}}
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Receives NEW_MESSAGE event", function() {
+          const msg = JSON.parse(res.getMessage());
+          expect(msg.type).to.equal("NEW_MESSAGE");
+        });
+
+        test("Has forwarded_from_chat", function() {
+          const msg = JSON.parse(res.getMessage());
+          expect(msg.payload.forwarded_from_chat).to.equal(bru.getEnvVar("test_direct_chat_id"));
+        });
+
+        test("Has forwarded_from_msg", function() {
+          const msg = JSON.parse(res.getMessage());
+          expect(msg.payload.forwarded_from_msg).to.be.a("number");
+        });
+
+        test("Sent to target chat", function() {
+          const msg = JSON.parse(res.getMessage());
+          expect(msg.payload.chat_id).to.equal(bru.getEnvVar("test_group_chat_id"));
+        });
+
+        test("Content matches original", function() {
+          const msg = JSON.parse(res.getMessage());
+          expect(msg.payload.content).to.equal("Hello from Bruno tests!");
+        });
+
+settings:
+  timeout: 5000

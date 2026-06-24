@@ -1,0 +1,35 @@
+info:
+  name: Create Saved Chat Idempotent
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "SAVED"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Returns same chat ID as first call", function() {
+          expect(res.getBody().id).to.equal(bru.getEnvVar("test_saved_chat_id"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

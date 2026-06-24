@@ -1,0 +1,37 @@
+info:
+  name: Confirm Upload
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}{{media_prefix}}/{{test_media_id}}/confirm"
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Status is READY", function() {
+          expect(res.getBody().status).to.equal("READY");
+        });
+
+        test("Media ID matches", function() {
+          expect(res.getBody().media_id).to.equal(bru.getEnvVar("test_media_id"));
+        });
+
+        test("Size bytes is positive", function() {
+          expect(res.getBody().size_bytes).to.be.greaterThan(0);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

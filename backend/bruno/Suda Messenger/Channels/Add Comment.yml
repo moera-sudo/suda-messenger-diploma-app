@@ -1,0 +1,39 @@
+info:
+  name: Add Comment
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/channels/{{test_channel_id}}/posts/{{test_message_id}}/comments"
+  body:
+    type: json
+    data: |-
+      {
+        "text": "Great post!"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_comment_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+        test("Has comment id", function() {
+          expect(res.getBody().id).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

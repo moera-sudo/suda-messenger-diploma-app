@@ -1,0 +1,34 @@
+info:
+  name: Register Device
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/user/device"
+  body:
+    type: json
+    data: |-
+      {
+        "fcm_token": "test-fcm-token-bruno-12345",
+        "device_name": "Bruno Test Device"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Action is NEW_DEVICE", function() {
+          expect(res.getBody().action).to.equal("NEW_DEVICE");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

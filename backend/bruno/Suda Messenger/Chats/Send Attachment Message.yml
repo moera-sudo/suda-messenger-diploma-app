@@ -1,0 +1,47 @@
+info:
+  name: Send Attachment Message
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{base_url}}{{messenger_prefix}}/chats/{{test_direct_chat_id}}/messages"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Check out this image!",
+        "type": "IMAGE",
+        "attachment_media_id": "{{test_media_id}}",
+        "client_side_id": "bruno-test-msg-002"
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setEnvVar("test_attachment_message_id", res.getBody().id);
+        }
+    - type: tests
+      code: |-
+        test("Status is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Has attachment_media_id", function() {
+          expect(res.getBody().attachment_media_id).to.equal(bru.getEnvVar("test_media_id"));
+        });
+
+        test("Type is IMAGE", function() {
+          expect(res.getBody().type).to.equal("IMAGE");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

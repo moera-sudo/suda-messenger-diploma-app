@@ -1,0 +1,308 @@
+version: '3'
+
+dotenv:
+  - .env
+
+vars:
+  BESU_IMAGE: hyperledger/besu:25.12.0
+  BESU_PATH: '{{.TASKFILE_DIR | toSlash}}/besu'
+  CONTRACTS_ARTIFACTS: '{{.TASKFILE_DIR | toSlash}}/contracts/artifacts/contracts'
+  CONTRACTS_BINDINGS: '{{.TASKFILE_DIR | toSlash}}/backend/transaction-service/contracts'
+
+tasks:
+  
+  # Миграции
+  
+  # Создать новый файл миграции
+  # Использование: task migrate-new name=create_indexes
+  migrate-new:
+    desc: Create a new migration file for messenger service
+    dir: ./
+    cmds:
+      - migrate create -ext sql -dir migrations -seq {{.name}}
+
+  # Накатить миграции (UP)
+  migrate-up:
+    desc: Apply all up migrations for messenger
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "$DATABASE_URL" up
+      - echo "✅ Migrations Applied!"
+
+  # Откатить последнюю миграцию (DOWN)
+  migrate-down:
+    desc: Rollback the last migration
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "$DATABASE_URL" down 1
+      - echo "⏪ Rolled back 1 migration"
+
+  # Принудительно выставить версию (если база залочилась dirty state)
+  migrate-force:
+    desc: Force set migration version
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "$DATABASE_URL" force {{.version}}
+
+  migrate-version:
+    desc: Check version of migration
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "$DATABASE_URL" version
+
+  # blockchain
+
+  besu-generate:
+    desc: Generate genesis.json file for besu client
+    cmds:
+      # 1. Удаление старой папки (PowerShell)
+      - cmd: powershell -Command "if (Test-Path '{{.BESU_PATH}}/network') { Remove-Item -Recurse -Force '{{.BESU_PATH}}/network' }"
+        platforms: [windows]
+      - cmd: rm -rf {{.BESU_PATH}}/network
+        platforms: [linux, darwin]
+
+      # 2. Генерация конфига (В ОДНУ СТРОКУ, чтобы не было ошибок синтаксиса shell)
+      - docker run --rm -v "{{.BESU_PATH}}:/opt/besu/data" {{.BESU_IMAGE}} operator generate-blockchain-config --config-file=/opt/besu/data/config/qbft-config.json --to=/opt/besu/data/network --private-key-file-name=key
+
+      # 3. Переименование папки
+      - cmd: powershell -Command "$folder = Get-ChildItem -Path '{{.BESU_PATH}}/network/keys' -Directory | Select-Object -First 1; if ($folder) { Rename-Item -Path $folder.FullName -NewName 'node1' }"
+        platforms: [windows]
+      - cmd: mv {{.BESU_PATH}}/network/keys/* {{.BESU_PATH}}/network/keys/node1
+        platforms: [linux, darwin]
+
+  # Swagger
+  go-swagger:
+    desc: Generate swagger docs for all services
+    cmds:
+      - task: go-swagger-messenger
+      - task: go-swagger-media
+
+  go-swagger-messenger:
+    desc: Generate swagger docs for messenger service
+    dir: backend/messenger-service
+    cmds:
+      - swag init -g cmd/main/main.go -o ../docs/swagger/messenger --parseDependency --parseInternal
+
+  go-swagger-media:
+    desc: Generate swagger docs for media service
+    dir: backend/media-service
+    cmds:
+      - swag init -g cmd/main/main.go -o ../docs/swagger/media --parseDependency --parseInternal
+
+# Solidity → Go bindings
+  go-bindings:
+    desc: Generate Go bindings for all Suda contracts (requires abigen + jq)
+    cmds:
+      - task: go-bindings-token
+      - task: go-bindings-nft
+      - task: go-bindings-marketplace
+      - task: go-bindings-escrow
+      - task: go-bindings-fundraising
+      - echo "All Go bindings generated"
+
+  go-bindings-token:
+    desc: Generate Go binding for SudaToken
+    cmds:
+      - mkdir -p {{.CONTRACTS_BINDINGS}}/sudatoken
+      - jq '.abi' {{.CONTRACTS_ARTIFACTS}}/SudaToken.sol/SudaToken.json > /tmp/SudaToken.abi.json
+      - abigen
+        --abi=/tmp/SudaToken.abi.json
+        --pkg=sudatoken
+        --type=SudaToken
+        --out={{.CONTRACTS_BINDINGS}}/sudatoken/SudaToken.go
+      - rm /tmp/SudaToken.abi.json
+
+  go-bindings-nft:
+    desc: Generate Go binding for SudaNFT
+    cmds:
+      - mkdir -p {{.CONTRACTS_BINDINGS}}/sudanft
+      - jq '.abi' {{.CONTRACTS_ARTIFACTS}}/SudaNFT.sol/SudaNFT.json > /tmp/SudaNFT.abi.json
+      - abigen
+        --abi=/tmp/SudaNFT.abi.json
+        --pkg=sudanft
+        --type=SudaNFT
+        --out={{.CONTRACTS_BINDINGS}}/sudanft/SudaNFT.go
+      - rm /tmp/SudaNFT.abi.json
+
+  go-bindings-marketplace:
+    desc: Generate Go binding for SudaMarketplace
+    cmds:
+      - mkdir -p {{.CONTRACTS_BINDINGS}}/sudamarketplace
+      - jq '.abi' {{.CONTRACTS_ARTIFACTS}}/SudaMarketplace.sol/SudaMarketplace.json > /tmp/SudaMarketplace.abi.json
+      - abigen
+        --abi=/tmp/SudaMarketplace.abi.json
+        --pkg=sudamarketplace
+        --type=SudaMarketplace
+        --out={{.CONTRACTS_BINDINGS}}/sudamarketplace/SudaMarketplace.go
+      - rm /tmp/SudaMarketplace.abi.json
+
+  go-bindings-escrow:
+    desc: Generate Go binding for SudaEscrow
+    cmds:
+      - mkdir -p {{.CONTRACTS_BINDINGS}}/sudaescrow
+      - jq '.abi' {{.CONTRACTS_ARTIFACTS}}/SudaEscrow.sol/SudaEscrow.json > /tmp/SudaEscrow.abi.json
+      - abigen
+        --abi=/tmp/SudaEscrow.abi.json
+        --pkg=sudaescrow
+        --type=SudaEscrow
+        --out={{.CONTRACTS_BINDINGS}}/sudaescrow/SudaEscrow.go
+      - rm /tmp/SudaEscrow.abi.json
+
+  go-bindings-fundraising:
+    desc: Generate Go binding for SudaFundraising
+    cmds:
+      - mkdir -p {{.CONTRACTS_BINDINGS}}/sudafundraising
+      - jq '.abi' {{.CONTRACTS_ARTIFACTS}}/SudaFundraising.sol/SudaFundraising.json > /tmp/SudaFundraising.abi.json
+      - abigen
+        --abi=/tmp/SudaFundraising.abi.json
+        --pkg=sudafundraising
+        --type=SudaFundraising
+        --out={{.CONTRACTS_BINDINGS}}/sudafundraising/SudaFundraising.go
+      - rm /tmp/SudaFundraising.abi.json
+
+# gRPC
+  go-proto:
+    desc: Generate proto files for all services
+    dir: backend/proto
+    cmds:
+      - protoc --go_out=. --go_opt=paths=source_relative
+        --go-grpc_out=. --go-grpc_opt=paths=source_relative
+        transaction/transaction.proto
+        transaction_access/service.proto
+        media/media.proto
+        messenger_access/messenger_access.proto
+      - echo "Proto files generated"
+
+  # Run commands
+  go-run-messenger:
+    desc: Run messenger service without docker
+    dir: backend/messenger-service
+    cmds:
+      - go run cmd/main/main.go
+
+  go-run-gateway:
+    desc: Run api gateway without docker
+    dir: backend/api-gateway
+    cmds:
+      - go run cmd/main.go
+
+  go-run-transaction:
+    desc: Run transaction service without docker
+    dir: backend/transaction-service
+    cmds:
+      - go run cmd/main/main.go
+
+  go-test-tx:
+    desc: Run transaction service unit tests
+    dir: backend/transaction-service
+    cmds:
+      - go test -race ./...
+
+  # SWAGGER
+  go-swagger-tx:
+    desc: Regenerate Swagger docs for transaction-service
+    dir: backend/transaction-service
+    cmds:
+      - swag init -g cmd/main/main.go -o ../docs/swagger/transaction --parseDependency --parseInternal
+      - echo "Transaction Swagger regenerated"
+
+  go-swagger-messenger:
+    desc: Regenerate Swagger docs for messenger-service
+    dir: backend/messenger-service
+    cmds:
+      - swag init -g cmd/main/main.go -o ../docs/swagger/messenger --parseDependency --parseInternal
+      - echo "Messenger Swagger regenerated"
+
+  go-swagger-all:
+    desc: Regenerate Swagger docs for all services
+    cmds:
+      - task: go-swagger-tx
+      - task: go-swagger-messenger
+
+  # === DEPLOYMENT ===
+  docker-up:
+    desc: Start full DEV stack (no nginx / no portainer, all ports exposed via override.yml)
+    cmds:
+      - docker compose up -d --build
+      - echo "Dev stack started."
+      - echo "Gateway        http://localhost:8080"
+      - echo "Messenger      http://localhost:8081  (Swagger /swagger/index.html)"
+      - echo "Transaction    http://localhost:8082  (Swagger /swagger/index.html)"
+      - echo "Media          http://localhost:8084"
+      - echo "MinIO console  http://localhost:9091"
+
+  docker-up-prod:
+    desc: Start full PROD stack (nginx :80 + portainer :9443, internal ports hidden)
+    cmds:
+      - docker compose -f docker-compose.yml up -d --build
+      - echo "Prod stack started."
+      - echo "HTTP entry     http://<host>/        (nginx → api-gateway, /swagger/*, ...)"
+      - echo "Portainer      http://<host>:9443/"
+
+  docker-down:
+    desc: Stop and remove all containers (preserve named volumes)
+    cmds: [docker compose down]
+
+  docker-down-volumes:
+    desc: "DESTRUCTIVE: stop, remove containers AND named volumes (postgres, besu, minio data wiped)"
+    cmds: [docker compose down -v]
+
+  docker-logs:
+    desc: Tail logs for all services
+    cmds: [docker compose logs -f --tail=200]
+
+  docker-ps:
+    desc: List containers with health status
+    cmds: [docker compose ps]
+
+  docker-rebuild:
+    desc: Rebuild a single service from scratch (use SVC=transaction-service)
+    cmds:
+      - docker compose build --no-cache {{.SVC}}
+      - docker compose up -d {{.SVC}}
+
+  secrets-generate:
+    desc: "Generate random docker secrets (overwrites existing! check before run)"
+    cmds:
+      - test -d secrets || mkdir secrets
+      - openssl rand -hex 32   > secrets/wallet_encryption_key.txt
+      - openssl rand -hex 32   > secrets/jwt_secret.txt
+      - openssl rand -hex 32   > secrets/gateway_signature_secret.txt
+      - openssl rand -hex 32   > secrets/init_data_sign_token.txt
+      - echo "Generated wallet_encryption_key.txt, jwt_secret.txt, gateway_signature_secret.txt, init_data_sign_token.txt"
+      - echo ""
+      - echo "Manual steps still required:"
+      - echo "  1) Put your treasury ETH private key into secrets/eth_private_key.txt (64 hex chars, no 0x, no newline)"
+      - echo "  2) Put firebase-adminsdk.json into secrets/ (download from Firebase Console)"
+
+  # DOCKER
+  docker-migrate-up:
+    desc: Apply all up migrations for messenger
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "postgres://postgres:123@localhost:55432/suda?sslmode=disable" up
+      - echo "✅ Migrations Applied!"
+
+  docker-migrate-down:
+    desc: Rollback the last migration. 
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "postgres://postgres:123@localhost:55432/suda?sslmode=disable" down 1
+      - echo "⏪ Rolled back 1 migration"
+
+  docker-migrate-force:
+    desc: Force set migration version
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "postgres://postgres:123@localhost:55432/suda?sslmode=disable" force {{.version}}
+
+  docker-migrate-version:
+    desc: Check version of migration
+    dir: ./
+    cmds:
+      - migrate -path migrations -database "postgres://postgres:123@localhost:55432/suda?sslmode=disable" version
+
+  db:script:
+    desc: Run DB script (cmd=truncate|drop_schema|info|superadmin). Add docker=true for inDocker version of your Database(if you have launched it in docker with 55432 port)
+    cmds:
+      - go run ./scripts/database/cmd/main/main.go -cmd={{.cmd}} -table="{{.table}}" {{if .docker}}-docker{{end}}

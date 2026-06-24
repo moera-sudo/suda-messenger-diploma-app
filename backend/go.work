@@ -1,0 +1,18 @@
+go 1.26.2
+
+// use (
+//     ./backend/api-gateway
+//     ./backend/messenger-service
+//     ./backend/transaction-service
+//     ./backend/proto
+// )
+
+use (
+	./backend/api-gateway
+	./backend/docs
+	./backend/media-service
+	./backend/messenger-service
+	./backend/proto
+	./backend/transaction-service
+	./scripts/database
+)

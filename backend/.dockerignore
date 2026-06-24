@@ -1,0 +1,48 @@
+# Build artifacts
+**/bin/
+**/*.test
+**/*.exe
+
+# Local dev / IDE
+.env
+.env.*
+*.local
+.vscode/
+.idea/
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Secrets — NEVER in images
+firebase-adminsdk.json
+secrets/
+
+# Docs (not needed in runtime)
+**/*.md
+
+
+# Frontend / node
+**/node_modules/
+**/dist/
+
+# Bruno
+bruno/
+
+# Deprecated
+suda-deprecated/
+
+# Web admin (отдельные образы)
+backend/web/
+
+# Hardhat artifacts
+contracts/artifacts/
+contracts/cache/
+contracts/coverage/
+contracts/node_modules/
+
+# Besu runtime data (только config нужен)
+besu/data/
+besu/network/data/
